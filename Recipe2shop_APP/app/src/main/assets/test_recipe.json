@@ -1,0 +1,278 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "recipe-salade-composee-001",
+                        "name":  "Salade composÃ©e aux lÃ©gumes de saison",
+                        "description":  "Une salade fraÃ®che et colorÃ©e, parfaite pour un repas lÃ©ger ou en accompagnement. Les lÃ©gumes peuvent varier selon la saison.",
+                        "servings":  4,
+                        "workTime":  15,
+                        "prepTime":  10,
+                        "cookTime":  0,
+                        "totalTime":  25,
+                        "types":  [
+                                      "entrÃ©e",
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "vÃ©gÃ©tarien",
+                                     "sain",
+                                     "rapide",
+                                     "saison"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "Laitue",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piÃ¨ce"
+                                                                 }
+                                                             ],
+                                                "notes":  "bien lavÃ©e et essorÃ©e"
+                                            },
+                                            {
+                                                "name":  "Tomates",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  3,
+                                                                     "unit":  "piÃ¨ce"
+                                                                 },
+                                                                 {
+                                                                     "nb":  300,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ],
+                                                "notes":  "bien mÃ»res, tomates de moyennes tailles"
+                                            },
+                                            {
+                                                "name":  "Concombre",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piÃ¨ce"
+                                                                 },
+                                                                 {
+                                                                     "nb":  250,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ],
+                                                "notes":  "moyen"
+                                            },
+                                            {
+                                                "name":  "Carottes",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "piÃ¨ce"
+                                                                 },
+                                                                 {
+                                                                     "nb":  200,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ],
+                                                "notes":  "moyennes"
+                                            },
+                                            {
+                                                "name":  "Huile d\u0027olive",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  3,
+                                                                     "unit":  "c. Ã  soupe"
+                                                                 }
+                                                             ],
+                                                "notes":  "extra vierge"
+                                            },
+                                            {
+                                                "name":  "Vinaigre",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "c. Ã  soupe"
+                                                                 }
+                                                             ],
+                                                "notes":  "balsamique ou de cidre"
+                                            },
+                                            {
+                                                "name":  "Sel",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "pincÃ©e"
+                                                                 }
+                                                             ],
+                                                "notes":  null
+                                            },
+                                            {
+                                                "name":  "Poivre",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "pincÃ©e"
+                                                                 }
+                                                             ],
+                                                "notes":  "moulu"
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "PrÃ©paration des lÃ©gumes",
+                                          "duration":  10,
+                                          "temperature":  null,
+                                          "notes":  "Utilisez une planche Ã  dÃ©couper propre",
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "Laitue",
+                                                                  "quantity":  1,
+                                                                  "unit":  "piÃ¨ce",
+                                                                  "notes":  "lavÃ©e"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "Tomates",
+                                                                  "quantity":  3,
+                                                                  "unit":  "piÃ¨ce",
+                                                                  "notes":  "coupÃ©es en quartiers"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "Concombre",
+                                                                  "quantity":  1,
+                                                                  "unit":  "piÃ¨ce",
+                                                                  "notes":  "coupÃ© en rondelles"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "Carottes",
+                                                                  "quantity":  2,
+                                                                  "unit":  "piÃ¨ce",
+                                                                  "notes":  "coupÃ©es en rondelles fines"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Lavez tous les lÃ©gumes Ã  l\u0027eau froide.",
+                                                               "instructionFalc":  "Lavez les lÃ©gumes Ã  l\u0027eau froide."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Ã‰pluchez les carottes et le concombre.",
+                                                               "instructionFalc":  "Enlevez la peau des carottes et du concombre."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  3,
+                                                               "instruction":  "Coupez la laitue en morceaux, les tomates en quartiers, le concombre en rondelles et les carottes en rondelles fines.",
+                                                               "instructionFalc":  "Coupez tout en petits morceaux."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  2,
+                                          "title":  "Assemblage de la salade",
+                                          "duration":  5,
+                                          "temperature":  null,
+                                          "notes":  "MÃ©langez dÃ©licatement pour ne pas Ã©craser les lÃ©gumes",
+                                          "ingredients":  [
+
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Dans un grand saladier, disposez la laitue en premier.",
+                                                               "instructionFalc":  "Mettez la laitue dans un grand plat."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Ajoutez les tomates, le concombre et les carottes.",
+                                                               "instructionFalc":  "Ajoutez les autres lÃ©gumes."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  3,
+                                                               "instruction":  "MÃ©langez dÃ©licatement avec les mains ou une spatule.",
+                                                               "instructionFalc":  "MÃ©langez doucement."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  3,
+                                          "title":  "PrÃ©paration de la vinaigrette",
+                                          "duration":  3,
+                                          "temperature":  null,
+                                          "notes":  "La vinaigrette doit Ãªtre bien mÃ©langÃ©e",
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "Huile d\u0027olive",
+                                                                  "quantity":  3,
+                                                                  "unit":  "c. Ã  soupe",
+                                                                  "notes":  null
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "Vinaigre",
+                                                                  "quantity":  1,
+                                                                  "unit":  "c. Ã  soupe",
+                                                                  "notes":  null
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "Sel",
+                                                                  "quantity":  1,
+                                                                  "unit":  "pincÃ©e",
+                                                                  "notes":  null
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "Poivre",
+                                                                  "quantity":  1,
+                                                                  "unit":  "pincÃ©e",
+                                                                  "notes":  null
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Dans un petit bol, versez l\u0027huile d\u0027olive, le vinaigre, le sel et le poivre.",
+                                                               "instructionFalc":  "Mettez l\u0027huile, le vinaigre, le sel et le poivre dans un petit bol."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Fouettez avec un petit fouet ou une fourchette jusqu\u0027Ã  ce que la vinaigrette soit bien Ã©mulsionnÃ©e.",
+                                                               "instructionFalc":  "MÃ©langez bien."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  4,
+                                          "title":  "Service",
+                                          "duration":  2,
+                                          "temperature":  null,
+                                          "notes":  "Servez immÃ©diatement pour prÃ©server la fraÃ®cheur",
+                                          "ingredients":  [
+
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Versez la vinaigrette sur la salade juste avant de servir.",
+                                                               "instructionFalc":  "Versez la vinaigrette sur la salade."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "MÃ©langez une derniÃ¨re fois et servez immÃ©diatement pour garder la fraÃ®cheur des lÃ©gumes.",
+                                                               "instructionFalc":  "MÃ©langez et servez tout de suite."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1705276800000,
+                                         "updatedAt":  1705276800000,
+                                         "exportedAt":  1705276800000
+                                     }
+                    }
+                ]
+}

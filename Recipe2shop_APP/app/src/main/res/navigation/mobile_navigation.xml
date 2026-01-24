@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.frombeyond.r2sl.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_recipes"
+        android:name="com.frombeyond.r2sl.ui.recipes.RecipesFragment"
+        android:label="@string/menu_recipes"
+        tools:layout="@layout/fragment_recipes" />
+
+    <fragment
+        android:id="@+id/edit_recipe"
+        android:name="com.frombeyond.r2sl.ui.recipes.EditRecipeFragment"
+        android:label="@string/recipes_edit_title"
+        tools:layout="@layout/fragment_edit_recipe" />
+
+    <fragment
+        android:id="@+id/recipe_viewer"
+        android:name="com.frombeyond.r2sl.ui.recipes.RecipeViewerFragment"
+        android:label="@string/recipe_viewer_title"
+        tools:layout="@layout/fragment_recipe_viewer" />
+
+    <fragment
+        android:id="@+id/nav_weekly_menu"
+        android:name="com.frombeyond.r2sl.ui.weeklymenu.WeeklyMenuFragment"
+        android:label="@string/menu_weekly_menu"
+        tools:layout="@layout/fragment_weekly_menu" />
+
+    <fragment
+        android:id="@+id/nav_shopping_lists"
+        android:name="com.frombeyond.r2sl.ui.shoppinglists.ShoppingListsFragment"
+        android:label="@string/menu_shopping_lists"
+        tools:layout="@layout/fragment_shopping_lists" />
+
+    <fragment
+        android:id="@+id/shopping_list_detail"
+        android:name="com.frombeyond.r2sl.ui.shoppinglists.ShoppingListDetailFragment"
+        android:label="@string/shopping_list_detail_title"
+        tools:layout="@layout/fragment_shopping_list_detail" />
+
+    <fragment
+        android:id="@+id/shopping_list_detail"
+        android:name="com.frombeyond.r2sl.ui.shoppinglists.ShoppingListDetailFragment"
+        android:label="@string/shopping_list_detail_title"
+        tools:layout="@layout/fragment_shopping_list_detail" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.frombeyond.r2sl.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/accessibility_settings"
+        android:name="com.frombeyond.r2sl.ui.accessibility.AccessibilitySettingsFragment"
+        android:label="@string/accessibility_section_title"
+        tools:layout="@layout/fragment_accessibility_settings" />
+
+    <fragment
+        android:id="@+id/accessibility_scale"
+        android:name="com.frombeyond.r2sl.ui.accessibility.AccessibilityScaleFragment"
+        android:label="@string/accessibility_section_title"
+        tools:layout="@layout/fragment_accessibility_scale" />
+
+    <fragment
+        android:id="@+id/accessibility_toggle"
+        android:name="com.frombeyond.r2sl.ui.accessibility.AccessibilityToggleFragment"
+        android:label="@string/accessibility_section_title"
+        tools:layout="@layout/fragment_accessibility_toggle" />
+
+    <fragment
+        android:id="@+id/accessibility_wizard"
+        android:name="com.frombeyond.r2sl.ui.accessibility.AccessibilityWizardFragment"
+        android:label="@string/accessibility_wizard_title"
+        tools:layout="@layout/fragment_accessibility_wizard" />
+
+    <fragment
+        android:id="@+id/nav_accessibility"
+        android:name="com.frombeyond.r2sl.ui.accessibility.AccessibilitySettingsFragment"
+        android:label="@string/accessibility_section_title"
+        tools:layout="@layout/fragment_accessibility_settings" />
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.frombeyond.r2sl.ui.settings.SettingsFragment"
+        android:label="Profil"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-016",
+                        "name":  "Risotto",
+                        "description":  "Risotto simple.",
+                        "servings":  2,
+                        "types":  [
+                                      "encas"
+                                  ],
+                        "tags":  [
+                                     "accompagnement"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "riz",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "fromage (parmesan, comte ou emmental)",
+                                                "category":  "fromage",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  50,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Cuire le riz et ajouter le fromage.",
+                                                               "instructionFalc":  "Cuire le riz."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004016,
+                                         "updatedAt":  1700004016
+                                     }
+                    }
+                ]
+}

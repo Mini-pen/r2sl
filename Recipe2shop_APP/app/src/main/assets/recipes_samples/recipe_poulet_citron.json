@@ -1,0 +1,146 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "r-002",
+                        "name":  "Poulet citron et herbes",
+                        "description":  "Poulet roti au citron avec herbes sechees.",
+                        "servings":  4,
+                        "workTime":  10,
+                        "prepTime":  5,
+                        "cookTime":  35,
+                        "totalTime":  50,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "proteine",
+                                     "four"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "blanc de poulet",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  4,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "citron",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "huile d\u0027olive",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "c. a soupe"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "herbes de provence",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "c. a cafe"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "sel",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "pincee"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparer la marinade",
+                                          "duration":  5,
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "citron",
+                                                                  "quantity":  1,
+                                                                  "unit":  "piece",
+                                                                  "notes":  "jus"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "huile d\u0027olive",
+                                                                  "quantity":  2,
+                                                                  "unit":  "c. a soupe"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "herbes de provence",
+                                                                  "quantity":  1,
+                                                                  "unit":  "c. a cafe"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "sel",
+                                                                  "quantity":  1,
+                                                                  "unit":  "pincee"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Presser le citron dans un bol.",
+                                                               "instructionFalc":  "Presser le citron."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Ajouter l\u0027huile, les herbes et le sel.",
+                                                               "instructionFalc":  "Mettre l\u0027huile, les herbes et le sel."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  2,
+                                          "title":  "Cuire le poulet",
+                                          "duration":  35,
+                                          "temperature":  "200 C",
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "blanc de poulet",
+                                                                  "quantity":  4,
+                                                                  "unit":  "pieces"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Enduire le poulet avec la marinade.",
+                                                               "instructionFalc":  "Mettre la sauce sur le poulet."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Cuire au four 35 minutes.",
+                                                               "instructionFalc":  "Mettre au four 35 minutes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700001000,
+                                         "updatedAt":  1700001000,
+                                         "exportedAt":  1700001000
+                                     }
+                    }
+                ]
+}

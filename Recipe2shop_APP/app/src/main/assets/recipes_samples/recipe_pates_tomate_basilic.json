@@ -1,0 +1,158 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "r-001",
+                        "name":  "Pates tomate basilic",
+                        "description":  "Un plat rapide a base de tomates et basilic.",
+                        "servings":  2,
+                        "workTime":  5,
+                        "prepTime":  5,
+                        "cookTime":  12,
+                        "totalTime":  22,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "vegetarien",
+                                     "rapide"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "pates",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  200,
+                                                                     "unit":  "g"
+                                                                 },
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "tasses"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "tomates concassees",
+                                                "category":  "conserve",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  300,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ],
+                                                "notes":  "en boite"
+                                            },
+                                            {
+                                                "name":  "basilic",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  6,
+                                                                     "unit":  "feuilles"
+                                                                 }
+                                                             ],
+                                                "notes":  "frais"
+                                            },
+                                            {
+                                                "name":  "huile d\u0027olive",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "c. a soupe"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "ail",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "gousse"
+                                                                 }
+                                                             ],
+                                                "notes":  "hachee"
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Cuire les pates",
+                                          "duration":  10,
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "pates",
+                                                                  "quantity":  200,
+                                                                  "unit":  "g"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Porter une casserole d\u0027eau a ebullition.",
+                                                               "instructionFalc":  "Faire bouillir de l\u0027eau."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Ajouter les pates et cuire 10 minutes.",
+                                                               "instructionFalc":  "Mettre les pates et cuire 10 minutes."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  2,
+                                          "title":  "Faire la sauce",
+                                          "duration":  7,
+                                          "temperature":  "feu moyen",
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "huile d\u0027olive",
+                                                                  "quantity":  1,
+                                                                  "unit":  "c. a soupe"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "ail",
+                                                                  "quantity":  1,
+                                                                  "unit":  "gousse",
+                                                                  "notes":  "hachee"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "tomates concassees",
+                                                                  "quantity":  300,
+                                                                  "unit":  "g"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "basilic",
+                                                                  "quantity":  6,
+                                                                  "unit":  "feuilles"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Faire chauffer l\u0027huile et l\u0027ail 1 minute.",
+                                                               "instructionFalc":  "Chauffer l\u0027huile et l\u0027ail."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Ajouter les tomates et cuire 5 minutes.",
+                                                               "instructionFalc":  "Mettre les tomates et cuire 5 minutes."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  3,
+                                                               "instruction":  "Ajouter le basilic en fin de cuisson.",
+                                                               "instructionFalc":  "Ajouter le basilic a la fin."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700000000,
+                                         "updatedAt":  1700000000,
+                                         "exportedAt":  1700000000
+                                     }
+                    }
+                ]
+}

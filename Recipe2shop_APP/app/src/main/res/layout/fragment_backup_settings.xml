@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/background_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:spacing="16dp">
+
+        <!-- Titre -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configuration des Chemins de Sauvegarde"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_blue"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configurez la structure des dossiers de sauvegarde sur Google Drive"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Configuration des Dossiers -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Structure des Dossiers"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Dossier Racine -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Dossier racine"
+                    app:startIconDrawable="@drawable/ic_folder"
+                    app:helperText="Nom du dossier principal sur Google Drive">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_root_folder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Dossier Profil -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Dossier profil"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:helperText="Sous-dossier pour les profils de thérapeutes">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_profile_folder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Dossier Configuration -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Dossier configuration"
+                    app:startIconDrawable="@drawable/ic_settings"
+                    app:helperText="Sous-dossier pour les paramètres de l'application">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_config_folder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Dossier Logs -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Dossier logs"
+                    app:startIconDrawable="@drawable/ic_description"
+                    app:helperText="Sous-dossier pour les fichiers de logs">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_logs_folder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Configuration des Noms de Fichiers -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Noms de Fichiers"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Timestamp -->
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cb_use_timestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Utiliser un timestamp dans les noms de fichiers"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Format Timestamp -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Format du timestamp"
+                    app:startIconDrawable="@drawable/ic_schedule"
+                    app:helperText="Format: yyyyMMdd_HHmmss (année, mois, jour, heure, minute, seconde)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_timestamp_format"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Aperçu de la Structure -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aperçu de la Structure"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/tv_structure_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chargement..."
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="monospace"
+                    android:background="@color/background_dark"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Exemple de nom de fichier:"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_filename_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chargement..."
+                    android:textSize="12sp"
+                    android:textColor="@color/accent_teal"
+                    android:fontFamily="monospace"
+                    android:background="@color/background_dark"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Boutons d'Action -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_reset_defaults"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Réinitialiser"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/error_color"
+                style="@style/Widget.Material3.Button" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save_config"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Sauvegarder"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/primary_blue" />
+
+        </LinearLayout>
+
+        <!-- Validation -->
+        <TextView
+            android:id="@+id/tv_validation_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="@color/error_color"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+</ScrollView>

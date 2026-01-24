@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Style personnalisé pour les cartes (thème sombre) -->
+    <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardBackgroundColor">@color/neutral_gray_dark</item>
+        <item name="android:layout_margin">@dimen/card_margin</item>
+    </style>
+    
+    <!-- Style pour le texte des titres (thème sombre) -->
+    <style name="TextAppearance.Recipe2shoplist.Title" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:textColor">@color/primary_blue_light</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginBottom">@dimen/text_spacing_medium</item>
+    </style>
+    
+    <!-- Style pour le texte des sous-titres (thème sombre) -->
+    <style name="TextAppearance.Recipe2shoplist.Subtitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textSize">@dimen/text_size_subtitle</item>
+        <item name="android:textColor">@color/secondary_green_light</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginBottom">@dimen/text_spacing_small</item>
+    </style>
+    
+    <!-- Style pour le texte du corps (thème sombre) -->
+    <style name="TextAppearance.Recipe2shoplist.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+        <item name="android:layout_marginBottom">@dimen/text_spacing_small</item>
+    </style>
+    
+    <!-- Style pour les boutons (thème sombre) -->
+    <style name="Widget.Recipe2shoplist.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/black</item>
+        <item name="backgroundTint">@color/primary_blue_light</item>
+        <item name="cornerRadius">@dimen/card_corner_radius</item>
+        <item name="android:padding">12dp</item>
+    </style>
+    
+    <!-- Style pour les boutons secondaires (thème sombre) -->
+    <style name="Widget.Recipe2shoplist.Button.Secondary" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/primary_blue_light</item>
+        <item name="cornerRadius">@dimen/card_corner_radius</item>
+        <item name="android:padding">12dp</item>
+    </style>
+</resources>

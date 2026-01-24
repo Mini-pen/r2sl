@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-010",
+                        "name":  "Pates au saumon et crevettes",
+                        "description":  "Plat complet de pates au saumon.",
+                        "servings":  2,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "plat complet"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "pates",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  200,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "saumon fume",
+                                                "category":  "poissons",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  100,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer les pates et le saumon.",
+                                                               "instructionFalc":  "Preparer pates et saumon."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004010,
+                                         "updatedAt":  1700004010
+                                     }
+                    }
+                ]
+}

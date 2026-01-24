@@ -1,0 +1,159 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "r-004",
+                        "name":  "Gateau au yaourt",
+                        "description":  "Gateau simple, moelleux et rapide.",
+                        "servings":  6,
+                        "workTime":  10,
+                        "prepTime":  10,
+                        "cookTime":  35,
+                        "totalTime":  55,
+                        "types":  [
+                                      "dessert"
+                                  ],
+                        "tags":  [
+                                     "simple",
+                                     "gouter"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "yaourt nature",
+                                                "category":  "crèmerie",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "pot"
+                                                                 }
+                                                             ],
+                                                "notes":  "sert de mesure"
+                                            },
+                                            {
+                                                "name":  "farine",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "pots"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "sucre",
+                                                "category":  "épicerie sucrée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "pot"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "oeufs",
+                                                "category":  "crèmerie",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  3,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "huile",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  0.5,
+                                                                     "unit":  "pot"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "levure chimique",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "sachet"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparer la pate",
+                                          "duration":  10,
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "yaourt nature",
+                                                                  "quantity":  1,
+                                                                  "unit":  "pot"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "sucre",
+                                                                  "quantity":  1,
+                                                                  "unit":  "pot"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "oeufs",
+                                                                  "quantity":  3,
+                                                                  "unit":  "pieces"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "farine",
+                                                                  "quantity":  2,
+                                                                  "unit":  "pots"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "huile",
+                                                                  "quantity":  0.5,
+                                                                  "unit":  "pot"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "levure chimique",
+                                                                  "quantity":  1,
+                                                                  "unit":  "sachet"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Melanger le yaourt, le sucre et les oeufs.",
+                                                               "instructionFalc":  "Melanger yaourt, sucre, oeufs."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Ajouter farine, huile et levure.",
+                                                               "instructionFalc":  "Mettre farine, huile, levure."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  2,
+                                          "title":  "Cuire le gateau",
+                                          "duration":  35,
+                                          "temperature":  "180 C",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Verser dans un moule.",
+                                                               "instructionFalc":  "Mettre dans un moule."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Cuire 35 minutes.",
+                                                               "instructionFalc":  "Cuire 35 minutes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700003000,
+                                         "updatedAt":  1700003000,
+                                         "exportedAt":  1700003000
+                                     }
+                    }
+                ]
+}

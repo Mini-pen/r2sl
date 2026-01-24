@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/fragment_padding">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/accessibility_section_title"
+            android:textSize="@dimen/text_size_title"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/accessibility_section_description"
+            android:textSize="@dimen/text_size_medium"
+            android:textColor="@color/text_secondary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_accessibility_text_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/accessibility_text_size" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_accessibility_ui_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/accessibility_ui_size" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_accessibility_contrast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/accessibility_contrast" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_accessibility_falc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/accessibility_falc" />
+
+        <!-- Premier bouton : lancer l'assistant -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_accessibility_wizard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/accessibility_open_wizard" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

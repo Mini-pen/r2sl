@@ -1,0 +1,66 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-005",
+                        "name":  "Escalope Normandes",
+                        "description":  "Escalope avec creme et merguez.",
+                        "servings":  2,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "viande / poisson / oeufs"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "escalope",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "creme fraiche",
+                                                "category":  "crèmerie",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "merguez",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer l\u0027escalope avec la creme et les merguez.",
+                                                               "instructionFalc":  "Preparer escalope, creme et merguez."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004005,
+                                         "updatedAt":  1700004005
+                                     }
+                    }
+                ]
+}

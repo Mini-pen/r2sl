@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    tools:context=".ui.weeklymenu.WeeklyMenuFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/fragment_padding">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation"
+            app:cardBackgroundColor="@color/primary_blue">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_weekly_menu_icon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="@string/weekly_menu_title"
+                        android:scaleType="centerCrop" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/weekly_menu_title"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_weekly_menu_calendar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/weekly_menu_start_date"
+                        android:textSize="28sp"
+                        android:contentDescription="@string/weekly_menu_start_date"
+                        app:icon="@drawable/ic_calendar_24"
+                        app:iconGravity="textStart"
+                        app:iconPadding="12dp"
+                        app:iconTint="@color/white"
+                        app:backgroundTint="@color/primary_blue"
+                        app:cornerRadius="28dp"
+                        style="@style/Widget.Material3.Button" />
+
+                    <TextView
+                        android:id="@+id/weekly_menu_start_date_display"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:gravity="center_vertical"
+                        android:textSize="@dimen/text_size_medium"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_view_week"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/weekly_menu_view_week" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_view_three_days"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/weekly_menu_view_three_days" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/weekly_menu_days_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/weekly_menu_three_days_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_three_days_prev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/weekly_menu_prev_days"
+                app:icon="@drawable/ic_arrow_left_24"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/primary_blue"
+                app:cornerRadius="24dp" />
+
+            <TextView
+                android:id="@+id/weekly_menu_three_days_range"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="@dimen/text_size_medium" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_three_days_next"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/weekly_menu_next_days"
+                app:icon="@drawable/ic_arrow_right_24"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/primary_blue"
+                app:cornerRadius="24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/weekly_menu_days_columns_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

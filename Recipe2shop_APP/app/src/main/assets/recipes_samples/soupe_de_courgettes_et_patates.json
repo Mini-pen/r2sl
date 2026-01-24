@@ -1,0 +1,66 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-019",
+                        "name":  "Soupe de courgettes et patates",
+                        "description":  "Soupe simple aux legumes.",
+                        "servings":  2,
+                        "types":  [
+                                      "entree"
+                                  ],
+                        "tags":  [
+                                     "soupe"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "courgette",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "pommes de terre",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "champignons",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Cuire les legumes et mixer.",
+                                                               "instructionFalc":  "Cuire les legumes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004019,
+                                         "updatedAt":  1700004019
+                                     }
+                    }
+                ]
+}

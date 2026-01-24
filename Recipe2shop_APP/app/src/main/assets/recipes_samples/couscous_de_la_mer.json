@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-004",
+                        "name":  "Couscous de la mer",
+                        "description":  "Couscous avec poisson.",
+                        "servings":  2,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "plat complet"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "semoule de couscous (moyen)",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  250,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "poisson",
+                                                "category":  "poissons",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer la semoule et le poisson.",
+                                                               "instructionFalc":  "Preparer semoule et poisson."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004004,
+                                         "updatedAt":  1700004004
+                                     }
+                    }
+                ]
+}

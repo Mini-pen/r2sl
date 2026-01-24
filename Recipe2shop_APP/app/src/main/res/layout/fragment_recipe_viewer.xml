@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_light">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="@dimen/card_elevation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="12dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_recipe_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/recipe_viewer_back"
+                app:icon="@drawable/ic_arrow_back_24"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/primary_blue"
+                app:cornerRadius="24dp" />
+
+            <TextView
+                android:id="@+id/recipe_viewer_current_section"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_recipe_prev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/recipe_viewer_prev"
+                app:icon="@drawable/ic_arrow_left_24"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/primary_blue"
+                app:cornerRadius="24dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_recipe_next"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/recipe_viewer_next"
+                app:icon="@drawable/ic_arrow_right_24"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/primary_blue"
+                app:cornerRadius="24dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_recipe_pdf"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Exporter en PDF"
+                android:text="PDF"
+                android:textSize="10sp"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/secondary_green"
+                app:cornerRadius="24dp" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/recipe_viewer_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/recipe_viewer_sections"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/fragment_padding" />
+    </androidx.core.widget.NestedScrollView>
+    
+    <!-- Bouton "plus d'info" en bas -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_more_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:text="ℹ️ Plus d'info"
+        android:textSize="12sp"
+        style="@style/Widget.Material3.Button.TextButton" />
+    
+    <!-- Bloc dépliable avec les métadonnées -->
+    <LinearLayout
+        android:id="@+id/metadata_expandable_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:padding="12dp">
+        
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📋 Métadonnées"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:layout_marginBottom="12dp" />
+                
+                <LinearLayout
+                    android:id="@+id/metadata_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+                
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_delete_recipe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="🗑️ Supprimer la recette"
+                    android:textColor="@color/white"
+                    app:backgroundTint="@color/error_color"
+                    style="@style/Widget.Material3.Button" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</LinearLayout>

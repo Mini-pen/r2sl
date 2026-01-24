@@ -1,0 +1,9 @@
+# Configuration locale pour le développement
+# Copiez ce fichier vers local.properties et remplissez les valeurs
+
+# Google API Key (depuis Firebase Console)
+GOOGLE_API_KEY=YOUR_GOOGLE_API_KEY_HERE
+
+# Google Client IDs (depuis Google Cloud Console)
+GOOGLE_CLIENT_ID_DEBUG=YOUR_DEBUG_CLIENT_ID_HERE
+GOOGLE_CLIENT_ID_RELEASE=YOUR_RELEASE_CLIENT_ID_HERE

@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-017",
+                        "name":  "Soupe de carotte / coco",
+                        "description":  "Soupe de carotte au lait de coco.",
+                        "servings":  2,
+                        "types":  [
+                                      "entree"
+                                  ],
+                        "tags":  [
+                                     "soupe"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "carotte (grosse)",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "lait de coco",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  20,
+                                                                     "unit":  "cl"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Cuire les carottes et ajouter le lait de coco.",
+                                                               "instructionFalc":  "Cuire les carottes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004017,
+                                         "updatedAt":  1700004017
+                                     }
+                    }
+                ]
+}

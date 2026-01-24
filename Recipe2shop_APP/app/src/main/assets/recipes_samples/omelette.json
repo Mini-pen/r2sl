@@ -1,0 +1,46 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-007",
+                        "name":  "Omelette",
+                        "description":  "Omelette simple.",
+                        "servings":  1,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "viande / poisson / oeufs"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "oeufs",
+                                                "category":  "crèmerie",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Battre les oeufs et cuire.",
+                                                               "instructionFalc":  "Battre les oeufs et cuire."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004007,
+                                         "updatedAt":  1700004007
+                                     }
+                    }
+                ]
+}

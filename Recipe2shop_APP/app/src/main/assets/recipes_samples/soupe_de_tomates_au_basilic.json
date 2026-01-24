@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-021",
+                        "name":  "Soupe de tomates au basilic",
+                        "description":  "Soupe de tomates simple.",
+                        "servings":  2,
+                        "types":  [
+                                      "entree"
+                                  ],
+                        "tags":  [
+                                     "soupe"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "tomates",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  4,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "basilic",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Cuire les tomates avec le basilic.",
+                                                               "instructionFalc":  "Cuire les tomates."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004021,
+                                         "updatedAt":  1700004021
+                                     }
+                    }
+                ]
+}

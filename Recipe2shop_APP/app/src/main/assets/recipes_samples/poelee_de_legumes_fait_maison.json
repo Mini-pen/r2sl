@@ -1,0 +1,76 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-012",
+                        "name":  "Poelee de legumes (fait maison)",
+                        "description":  "Poelee de legumes maison.",
+                        "servings":  2,
+                        "types":  [
+                                      "encas"
+                                  ],
+                        "tags":  [
+                                     "accompagnement"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "tomates",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "poireaux",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "oignon",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "vache qui rit",
+                                                "category":  "fromage",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer les legumes et melanger.",
+                                                               "instructionFalc":  "Preparer les legumes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004012,
+                                         "updatedAt":  1700004012
+                                     }
+                    }
+                ]
+}

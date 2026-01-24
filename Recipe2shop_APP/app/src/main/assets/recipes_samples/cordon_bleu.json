@@ -1,0 +1,46 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-002",
+                        "name":  "Cordon bleu",
+                        "description":  "Plat simple de cordon bleu.",
+                        "servings":  1,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "viande / poisson / oeufs"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "cordons bleus",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer les cordons bleus.",
+                                                               "instructionFalc":  "Preparer la viande."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004002,
+                                         "updatedAt":  1700004002
+                                     }
+                    }
+                ]
+}

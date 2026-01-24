@@ -1,0 +1,66 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-014",
+                        "name":  "Poisson coco et patates douces",
+                        "description":  "Plat complet au poisson et coco.",
+                        "servings":  2,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "plat complet"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "poisson",
+                                                "category":  "poissons",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "creme de coco",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  20,
+                                                                     "unit":  "cl"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "patates douces",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  200,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer le poisson et les patates douces.",
+                                                               "instructionFalc":  "Preparer poisson et patates."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004014,
+                                         "updatedAt":  1700004014
+                                     }
+                    }
+                ]
+}

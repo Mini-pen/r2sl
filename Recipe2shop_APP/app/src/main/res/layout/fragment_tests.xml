@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/background_light">
+
+    <!-- En-tête -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tests_title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_blue"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tests_description"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Zone de résultats (ScrollView en haut) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:minHeight="200dp"
+        android:background="@android:color/white"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvTestResults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tests_default_message"
+            android:textSize="13sp"
+            android:textColor="@color/text_primary"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="4dp"
+            android:padding="8dp"
+            android:minHeight="180dp" />
+
+    </ScrollView>
+
+    <!-- Case à cocher pour mode verbose -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <CheckBox
+            android:id="@+id/cbVerboseMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tests_verbose_mode"
+            android:textSize="12sp"
+            android:textColor="@color/text_primary"
+            android:checked="false" />
+
+    </LinearLayout>
+
+    <!-- Boutons d'action -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Bouton principal : Lancer tous les tests -->
+        <Button
+            android:id="@+id/btnRunAllTests"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tests_run_all_tests"
+            android:textSize="12sp"
+            android:backgroundTint="@color/secondary_green"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="4dp"
+            android:drawableStart="@drawable/ic_play_arrow"
+            android:drawablePadding="8dp" />
+
+        <!-- Boutons secondaires -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnClearTestLogs"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/tests_clear_logs"
+                android:textSize="12sp"
+                android:backgroundTint="@color/accent_teal"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="4dp"
+                android:drawableStart="@drawable/ic_clear"
+                android:drawablePadding="4dp" />
+
+            <Button
+                android:id="@+id/btnExportLogs"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/tests_export_logs"
+                android:textSize="12sp"
+                android:backgroundTint="@color/primary_blue"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="4dp"
+                android:drawableStart="@drawable/ic_export"
+                android:drawablePadding="4dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

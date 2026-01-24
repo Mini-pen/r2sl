@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-003",
+                        "name":  "Couscous (recette Nathalie)",
+                        "description":  "Couscous simple avec semoule et poulet.",
+                        "servings":  2,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "plat complet"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "semoule de couscous (moyen)",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  250,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "pilons de poulet",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer la semoule et le poulet.",
+                                                               "instructionFalc":  "Preparer semoule et poulet."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004003,
+                                         "updatedAt":  1700004003
+                                     }
+                    }
+                ]
+}

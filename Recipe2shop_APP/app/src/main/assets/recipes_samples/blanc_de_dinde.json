@@ -1,0 +1,46 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-001",
+                        "name":  "Blanc de dinde",
+                        "description":  "Plat simple a base de blanc de dinde.",
+                        "servings":  1,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "viande / poisson / oeufs"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "blanc de dinde",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer le blanc de dinde.",
+                                                               "instructionFalc":  "Preparer la viande."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004001,
+                                         "updatedAt":  1700004001
+                                     }
+                    }
+                ]
+}

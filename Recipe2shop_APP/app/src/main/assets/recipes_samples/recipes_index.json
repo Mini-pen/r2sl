@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "recipes": [
+    { "fileName": "blanc_de_dinde.json" },
+    { "fileName": "cordon_bleu.json" },
+    { "fileName": "couscous_de_la_mer.json" },
+    { "fileName": "couscous_recette_nathalie.json" },
+    { "fileName": "escalope_normandes.json" },
+    { "fileName": "jambon_blanc.json" },
+    { "fileName": "omelette.json" },
+    { "fileName": "palets_de_legumes.json" },
+    { "fileName": "pates.json" },
+    { "fileName": "pates_au_saumon_et_crevettes.json" },
+    { "fileName": "plat_prepare.json" },
+    { "fileName": "poelee_de_legumes_fait_maison.json" },
+    { "fileName": "poelee_de_legumes_tout_pret.json" },
+    { "fileName": "poisson_coco_et_patates_douces.json" },
+    { "fileName": "ratatouille_boite.json" },
+    { "fileName": "recipe_gateau_yaourt.json" },
+    { "fileName": "recipe_pates_tomate_basilic.json" },
+    { "fileName": "recipe_poulet_citron.json" },
+    { "fileName": "recipe_salade_quinoa.json" },
+    { "fileName": "risotto.json" },
+    { "fileName": "soupe_de_carotte_coco.json" },
+    { "fileName": "soupe_de_courgettes_et_carottes_au_kiri.json" },
+    { "fileName": "soupe_de_courgettes_et_patates.json" },
+    { "fileName": "soupe_de_legumes_reste.json" },
+    { "fileName": "soupe_de_tomates_au_basilic.json" }
+  ]
+}

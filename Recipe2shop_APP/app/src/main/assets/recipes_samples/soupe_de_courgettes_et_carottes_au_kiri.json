@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-018",
+                        "name":  "Soupe de courgettes et carottes au Kiri",
+                        "description":  "Soupe douce aux legumes.",
+                        "servings":  2,
+                        "types":  [
+                                      "entree"
+                                  ],
+                        "tags":  [
+                                     "soupe"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "courgette",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  300,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "carottes",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  100,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Cuire les legumes et mixer.",
+                                                               "instructionFalc":  "Cuire les legumes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004018,
+                                         "updatedAt":  1700004018
+                                     }
+                    }
+                ]
+}

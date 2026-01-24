@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:padding="@dimen/fragment_padding">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- En-tête avec titre et icône -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation"
+            app:cardBackgroundColor="@color/primary_blue">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🔍 Diagnostic d'Authentification"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_diagnostic"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/white" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Description -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/primary_blue_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ce diagnostic vérifie automatiquement tous les composants nécessaires à l'authentification Google et Firebase."
+                    android:textSize="14sp"
+                    android:textColor="@color/primary_blue_dark"
+                    android:lineSpacingExtra="2dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Zone de résultats -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📊 Résultats du Diagnostic"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:padding="16dp"
+                    android:paddingBottom="8dp" />
+
+                <ScrollView
+                    android:id="@+id/scroll_view_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/neutral_gray_dark"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tv_diagnostic_results"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cliquez sur 'Lancer le Diagnostic' pour commencer..."
+                        android:textSize="13sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="monospace"
+                        android:lineSpacingExtra="4dp"
+                        android:padding="8dp" />
+
+                </ScrollView>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section Actions Principales -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🚀 Actions Principales"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Bouton principal de diagnostic -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_run_diagnostic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🚀 Lancer le Diagnostic"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="12dp"
+                    app:backgroundTint="@color/primary_blue"
+                    app:icon="@drawable/ic_menu_diagnostic"
+                    app:iconGravity="textStart"
+                    style="@style/Widget.Material3.Button" />
+
+                <!-- Boutons secondaires en ligne -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_test_auth"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="🔐 Tester Auth"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/accent_teal"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_auto_configure"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="⚙️ Auto Config"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/secondary_green"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section Gestion des Logs -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📋 Gestion des Logs"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Première ligne de boutons logs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_view_logs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="📋 Voir Logs"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/secondary_green"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_clear_logs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="🗑️ Effacer"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/error_color"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                </LinearLayout>
+
+                <!-- Deuxième ligne de boutons logs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_copy_logs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="📋 Copier"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/primary_blue"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_share_logs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="📤 Partager"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/accent_teal"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                </LinearLayout>
+
+                <!-- Bouton accès fichier -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_access_log_file"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📁 Accéder au Fichier de Log"
+                    android:textSize="14sp"
+                    app:backgroundTint="@color/neutral_gray"
+                    android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section Fichiers et Permissions -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔧 Maintenance et Permissions"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Boutons fichiers -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_analyze_files"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="📁 Analyser"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/warning_color"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_clear_files"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="🗑️ Nettoyer"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/error_color"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                </LinearLayout>
+
+                <!-- Boutons permissions et sauvegarde -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_check_permissions"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="🔐 Permissions"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/info_color"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_backup_logs_to_drive"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="☁️ Drive"
+                        android:textSize="14sp"
+                        android:enabled="false"
+                        app:backgroundTint="@color/primary_blue"
+                        android:textColor="@color/white"
+                        style="@style/Widget.Material3.Button" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Section Informations -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/primary_blue_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📝 Informations sur les Logs"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue_dark"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Les erreurs sont automatiquement enregistrées dans un fichier local"
+                    android:textSize="14sp"
+                    android:textColor="@color/primary_blue_dark"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Le fichier de log est accessible depuis l'appareil"
+                    android:textSize="14sp"
+                    android:textColor="@color/primary_blue_dark"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Utilisez 'Voir les Logs' pour consulter l'historique des erreurs"
+                    android:textSize="14sp"
+                    android:textColor="@color/primary_blue_dark" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

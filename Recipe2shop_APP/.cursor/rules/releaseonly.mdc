@@ -1,0 +1,5 @@
+---
+description: build
+alwaysApply: false
+---
+To allow correct sign-in of Google user, always build in release mode

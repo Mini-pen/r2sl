@@ -1,0 +1,66 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-006",
+                        "name":  "Jambon blanc",
+                        "description":  "Assiette de jambon avec accompagnements.",
+                        "servings":  2,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "viande / poisson / oeufs"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "tranches de jambon blanc",
+                                                "category":  "viandes",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  2,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "cocktail de fruit de mer (surgele)",
+                                                "category":  "surgelé",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  100,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "ratatouille (boite)",
+                                                "category":  "conserve",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  200,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer le jambon et les accompagnements.",
+                                                               "instructionFalc":  "Preparer jambon et legumes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004006,
+                                         "updatedAt":  1700004006
+                                     }
+                    }
+                ]
+}

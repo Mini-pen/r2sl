@@ -1,0 +1,76 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-008",
+                        "name":  "Palets de legumes",
+                        "description":  "Accompagnement simple.",
+                        "servings":  2,
+                        "types":  [
+                                      "encas"
+                                  ],
+                        "tags":  [
+                                     "accompagnement"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "palets de legumes",
+                                                "category":  "surgelé",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  3,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "crevettes",
+                                                "category":  "poissons",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  100,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "echalottes",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "oeufs",
+                                                "category":  "crèmerie",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer les palets et les ingredients.",
+                                                               "instructionFalc":  "Preparer les ingredients."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004008,
+                                         "updatedAt":  1700004008
+                                     }
+                    }
+                ]
+}

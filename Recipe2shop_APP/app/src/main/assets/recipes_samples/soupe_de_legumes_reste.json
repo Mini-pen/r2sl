@@ -1,0 +1,56 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-020",
+                        "name":  "Soupe de legumes avec ce qui reste",
+                        "description":  "Soupe a base de legumes restants.",
+                        "servings":  2,
+                        "types":  [
+                                      "entree"
+                                  ],
+                        "tags":  [
+                                     "soupe"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "legumes restants a la maison",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "bouillon de legumes",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Cuire les legumes avec le bouillon.",
+                                                               "instructionFalc":  "Cuire les legumes."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004020,
+                                         "updatedAt":  1700004020
+                                     }
+                    }
+                ]
+}

@@ -1,0 +1,66 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-011",
+                        "name":  "Plat prepare",
+                        "description":  "Plat complet avec accompagnements.",
+                        "servings":  1,
+                        "types":  [
+                                      "plat principal"
+                                  ],
+                        "tags":  [
+                                     "plat complet"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "plat prepare",
+                                                "category":  "Autres",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "oignon",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "kiri",
+                                                "category":  "fromage",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  3,
+                                                                     "unit":  "pieces"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Preparer le plat et les accompagnements.",
+                                                               "instructionFalc":  "Preparer le plat."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004011,
+                                         "updatedAt":  1700004011
+                                     }
+                    }
+                ]
+}

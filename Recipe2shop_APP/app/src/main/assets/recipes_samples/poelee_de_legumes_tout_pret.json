@@ -1,0 +1,46 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "csv-013",
+                        "name":  "Poelee de legumes (tout pret)",
+                        "description":  "Poelee de legumes deja preparee.",
+                        "servings":  2,
+                        "types":  [
+                                      "encas"
+                                  ],
+                        "tags":  [
+                                     "accompagnement"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "poelee de legumes",
+                                                "category":  "surgelé",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "portion"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Preparation",
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Rechauffer la poelee.",
+                                                               "instructionFalc":  "Rechauffer."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700004013,
+                                         "updatedAt":  1700004013
+                                     }
+                    }
+                ]
+}

@@ -1,0 +1,151 @@
+{
+    "version":  "1.0",
+    "recipes":  [
+                    {
+                        "id":  "r-003",
+                        "name":  "Salade de quinoa",
+                        "description":  "Salade froide au quinoa et legumes croquants.",
+                        "servings":  3,
+                        "workTime":  10,
+                        "prepTime":  10,
+                        "cookTime":  15,
+                        "totalTime":  35,
+                        "types":  [
+                                      "entree",
+                                      "encas"
+                                  ],
+                        "tags":  [
+                                     "vegetarien",
+                                     "froid"
+                                 ],
+                        "ingredients":  [
+                                            {
+                                                "name":  "quinoa",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 },
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "tasse"
+                                                                 }
+                                                             ],
+                                                "notes":  "sec"
+                                            },
+                                            {
+                                                "name":  "concombre",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  0.5,
+                                                                     "unit":  "piece"
+                                                                 }
+                                                             ],
+                                                "notes":  "en des"
+                                            },
+                                            {
+                                                "name":  "tomates cerises",
+                                                "category":  "fruits et légumes frais",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  150,
+                                                                     "unit":  "g"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "huile d\u0027olive",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "c. a soupe"
+                                                                 }
+                                                             ]
+                                            },
+                                            {
+                                                "name":  "jus de citron",
+                                                "category":  "épicerie salée",
+                                                "quantity":  [
+                                                                 {
+                                                                     "nb":  1,
+                                                                     "unit":  "c. a soupe"
+                                                                 }
+                                                             ]
+                                            }
+                                        ],
+                        "steps":  [
+                                      {
+                                          "stepOrder":  1,
+                                          "title":  "Cuire le quinoa",
+                                          "duration":  15,
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "quinoa",
+                                                                  "quantity":  150,
+                                                                  "unit":  "g"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Rincer le quinoa sous l\u0027eau.",
+                                                               "instructionFalc":  "Laver le quinoa."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Cuire 15 minutes dans l\u0027eau.",
+                                                               "instructionFalc":  "Cuire 15 minutes."
+                                                           }
+                                                       ]
+                                      },
+                                      {
+                                          "stepOrder":  2,
+                                          "title":  "Assembler la salade",
+                                          "duration":  10,
+                                          "ingredients":  [
+                                                              {
+                                                                  "ingredientName":  "concombre",
+                                                                  "quantity":  0.5,
+                                                                  "unit":  "piece"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "tomates cerises",
+                                                                  "quantity":  150,
+                                                                  "unit":  "g"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "huile d\u0027olive",
+                                                                  "quantity":  1,
+                                                                  "unit":  "c. a soupe"
+                                                              },
+                                                              {
+                                                                  "ingredientName":  "jus de citron",
+                                                                  "quantity":  1,
+                                                                  "unit":  "c. a soupe"
+                                                              }
+                                                          ],
+                                          "subSteps":  [
+                                                           {
+                                                               "subStepOrder":  1,
+                                                               "instruction":  "Couper le concombre et les tomates.",
+                                                               "instructionFalc":  "Couper le concombre et les tomates."
+                                                           },
+                                                           {
+                                                               "subStepOrder":  2,
+                                                               "instruction":  "Melanger avec le quinoa et assaisonner.",
+                                                               "instructionFalc":  "Melanger et assaisonner."
+                                                           }
+                                                       ]
+                                      }
+                                  ],
+                        "metadata":  {
+                                         "createdAt":  1700002000,
+                                         "updatedAt":  1700002000,
+                                         "exportedAt":  1700002000
+                                     }
+                    }
+                ]
+}

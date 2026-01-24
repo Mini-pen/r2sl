@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.settings.SettingsFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Titre des paramètres -->
+            <TextView
+                android:id="@+id/text_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_title"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_blue"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Section accessibilite -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_accessibility_settings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/accessibility_section_title" />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section d'authentification -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Compte utilisateur"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_blue"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- État non connecté -->
+                    <LinearLayout
+                        android:id="@+id/settings_not_connected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Aucun compte connecté"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="16dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_settings_login"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/auth_connect_with_google" />
+
+                    </LinearLayout>
+
+                    <!-- État connecté -->
+                    <LinearLayout
+                        android:id="@+id/settings_connected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/iv_settings_profile"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/ic_menu_patients"
+                                android:background="@color/primary_blue_light"
+                                android:scaleType="centerCrop"
+                                android:adjustViewBounds="true"
+                                app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_settings_user_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Nom de l'utilisateur"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/primary_blue" />
+
+                                <TextView
+                                    android:id="@+id/tv_settings_user_email"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="email@example.com"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/text_secondary" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_settings_logout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/auth_logout"
+                            style="@style/Widget.Material3.Button" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section des paramètres de l'application -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Paramètres de l'application"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_blue"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Case à cocher pour les fonctionnalités développeur -->
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cb_dev_features"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fonctionnalités pour développeur"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:checked="false"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Affiche les outils de diagnostic et de débogage dans le menu"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_clear_app_data"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/settings_dev_clear_data"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_refresh_recipes_index"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/recipes_refresh_list"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_load_default_recipes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/settings_load_default_recipes"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_update_recipes_metadata"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Mettre à jour les métadonnées des recettes"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_fix_recipes_sources_ingredients"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Corriger sources et ingrédients"
+                        android:visibility="gone" />
+
+                    <!-- Section sauvegarde locale (dans le bloc développeur) -->
+                    <LinearLayout
+                        android:id="@+id/dev_backup_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:background="@color/primary_blue_light">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="💾 Sauvegarde locale"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_blue"
+                            android:layout_marginBottom="12dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_backup_local_zip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/settings_local_backup_export" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_restore_local_zip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/settings_local_backup_import" />
+                    </LinearLayout>
+
+                    <!-- Bloc de logs d'erreurs (visible uniquement en mode développeur) -->
+                    <LinearLayout
+                        android:id="@+id/dev_error_logs_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:background="@color/primary_blue_light">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="4dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="📋 Logs d'erreurs"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primary_blue" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_copy_error_logs"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:text="📋 COPIER" />
+
+                            <TextView
+                                android:id="@+id/tv_log_file_path"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="9sp"
+                                android:textColor="@color/text_secondary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace"
+                                android:maxLines="2"
+                                android:ellipsize="end" />
+                        </LinearLayout>
+
+                        <androidx.core.widget.NestedScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:background="@color/white"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:id="@+id/tv_error_logs"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="11sp"
+                                android:textColor="@color/text_primary"
+                                android:fontFamily="monospace"
+                                android:lineSpacingMultiplier="1.2"
+                                android:text="Aucune erreur enregistrée" />
+                        </androidx.core.widget.NestedScrollView>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_clear_error_logs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="EFFACER LES LOGS" />
+                    </LinearLayout>
+
+                    <!-- Bloc de logs d'authentification (visible uniquement en mode développeur) -->
+                    <LinearLayout
+                        android:id="@+id/dev_auth_logs_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:background="@color/secondary_green_light">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="4dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="🔐 Logs d'authentification Google"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primary_blue" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_copy_auth_logs"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:text="📋 COPIER" />
+
+                            <TextView
+                                android:id="@+id/tv_auth_log_file_path"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="9sp"
+                                android:textColor="@color/text_secondary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace"
+                                android:maxLines="2"
+                                android:ellipsize="end" />
+                        </LinearLayout>
+
+                        <androidx.core.widget.NestedScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:background="@color/white"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:id="@+id/tv_auth_logs"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="11sp"
+                                android:textColor="@color/text_primary"
+                                android:fontFamily="monospace"
+                                android:lineSpacingMultiplier="1.2"
+                                android:text="Aucun log d'authentification enregistré" />
+                        </androidx.core.widget.NestedScrollView>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_clear_auth_logs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="EFFACER LES LOGS" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section import de pack de recettes -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📦 Importer un pack de recettes"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_blue"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Importez un fichier ZIP contenant des recettes JSON. Si une recette existe déjà avec le même nom, elle sera conservée et la nouvelle sera renommée avec 'bis'."
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_import_recipe_pack"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📦 Importer un pack de recettes" />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section Google Drive -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="☁️ Google Drive"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_blue" />
+
+                        <TextView
+                            android:id="@+id/tv_drive_connection_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔴 Non connecté"
+                            android:textSize="12sp"
+                            android:textColor="@color/error_color"
+                            android:background="@drawable/status_background"
+                            android:padding="4dp"
+                            android:paddingHorizontal="8dp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Connectez-vous à Google Drive pour sauvegarder et restaurer vos données"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Boutons de connexion/déconnexion -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_connect_google_drive"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="SE CONNECTER" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_disconnect_google_drive"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="SE DÉCONNECTER"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <!-- Section Profil (visible si connecté) -->
+                    <LinearLayout
+                        android:id="@+id/section_profile_backup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="👤 Sauvegarde du Profil"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sauvegardez votre profil thérapeute sur Google Drive"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_marginBottom="16dp">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_backup_profile_to_drive"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="8dp"
+                                android:text="SAUVEGARDER PROFIL" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_restore_profile_from_drive"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
+                                android:text="CHARGER PROFIL" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Section Paramètres (visible si connecté) -->
+                    <LinearLayout
+                        android:id="@+id/section_settings_backup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚙️ Sauvegarde des Paramètres"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sauvegardez vos paramètres d'application sur Google Drive"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_backup_settings_to_drive"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="8dp"
+                                android:text="SAUVEGARDER PARAMÈTRES" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_restore_settings_from_drive"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
+                                android:text="CHARGER PARAMÈTRES" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
