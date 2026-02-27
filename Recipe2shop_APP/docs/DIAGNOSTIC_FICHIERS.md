@@ -1,8 +1,8 @@
-# 🔍 Guide de Diagnostic des Fichiers - TherapIA
+# 🔍 Guide de Diagnostic des Fichiers - Recipe2shoplist (R2SL)
 
 ## 📋 Vue d'ensemble
 
-Ce guide explique comment utiliser le système de diagnostic des fichiers intégré dans TherapIA pour identifier et résoudre les problèmes de stockage et de corruption de données qui peuvent causer des plantages au lancement de l'application.
+Ce guide explique comment utiliser le système de diagnostic des fichiers intégré dans Recipe2shoplist pour identifier et résoudre les problèmes de stockage et de corruption de données qui peuvent causer des plantages au lancement de l'application.
 
 ## 🚀 Fonctionnalités du Système
 
@@ -30,7 +30,7 @@ Ce guide explique comment utiliser le système de diagnostic des fichiers intég
 ## 📱 Utilisation sur l'Appareil
 
 ### **Accès au Diagnostic des Fichiers**
-1. **Ouvrir l'application** TherapIA
+1. **Ouvrir l'application** Recipe2shoplist
 2. **Naviguer vers** le fragment de diagnostic d'authentification
 3. **Utiliser les nouveaux boutons** :
    - 📁 **Analyser les Fichiers** : Lance l'analyse complète
@@ -58,27 +58,27 @@ Ce guide explique comment utiliser le système de diagnostic des fichiers intég
 ### **Types de Fichiers Analysés**
 
 #### **Répertoire de Données Internes**
-- **Emplacement** : `/data/data/com.therapia_solutions.therapia/files/`
+- **Emplacement** : `/data/data/com.frombeyond.r2sl/files/`
 - **Contenu** : Fichiers de configuration, données utilisateur, profils
 - **Seuils** : Fichiers > 100MB ou permissions incorrectes = WARNING
 
 #### **Répertoire de Cache**
-- **Emplacement** : `/data/data/com.therapia_solutions.therapia/cache/`
+- **Emplacement** : `/data/data/com.frombeyond.r2sl/cache/`
 - **Contenu** : Fichiers temporaires, images en cache
 - **Seuils** : Cache > 200MB ou 80% de fichiers anciens = WARNING
 
 #### **Fichiers de Base de Données**
-- **Emplacement** : `/data/data/com.therapia_solutions.therapia/databases/`
+- **Emplacement** : `/data/data/com.frombeyond.r2sl/databases/`
 - **Contenu** : Bases de données SQLite, fichiers de schéma
 - **Seuils** : Fichiers vides ou corrompus = ERROR
 
 #### **Fichiers de Configuration**
-- **Fichiers** : `therapist_profile.json`, `app_preferences.json`, `user_settings.json`
+- **Fichiers** : `user_profile.json`, `app_preferences.json`, `user_settings.json`
 - **Contenu** : Paramètres utilisateur, préférences d'application
 - **Seuils** : Fichiers manquants = WARNING, JSON invalide = ERROR
 
 #### **Fichiers de Logs**
-- **Emplacement** : `/data/data/com.therapia_solutions.therapia/files/logs/`
+- **Emplacement** : `/data/data/com.frombeyond.r2sl/files/logs/`
 - **Contenu** : Logs d'erreurs, traces de débogage
 - **Seuils** : Fichiers > 10MB ou total > 50MB = WARNING
 
@@ -150,7 +150,7 @@ Ce guide explique comment utiliser le système de diagnostic des fichiers intég
 - **Fichiers temporaires** : Préfixes temp_, tmp_, .tmp
 
 ### **Fichiers Préservés**
-- **Configuration utilisateur** : therapist_profile.json
+- **Configuration utilisateur** : user_profile.json
 - **Préférences** : app_preferences.json
 - **Base de données** : Fichiers de données importants
 - **Fichiers système** : Configuration de l'application

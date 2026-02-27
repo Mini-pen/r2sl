@@ -433,6 +433,100 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Section liste des rayons -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛒 Liste des rayons"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_blue"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rayons proposés lors de l’ajout d’un ingrédient. Choisir « Autre » pour ajouter un rayon à la volée."
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/rayons_list_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_rayons_prefill"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Pré-remplir depuis les recettes" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_rayons_add"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ajouter un rayon" />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section dictionnaire emojis ingrédients -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="😀 Dictionnaire emojis ingrédients"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_blue"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Associez des emojis aux ingrédients pour les afficher dans les recettes. Chargez le dictionnaire par défaut ou importez le vôtre (JSON)."
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_load_default_emoji_dict"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Charger les emojis par défaut" />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Section import de pack de recettes -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

@@ -11,7 +11,7 @@ import android.util.Log
 class AppSettingsManager(private val context: Context) {
     
     companion object {
-        private const val PREFS_NAME = "therapia_settings"
+        private const val PREFS_NAME = "r2sl_settings"
         private const val KEY_DEV_FEATURES_ENABLED = "dev_features_enabled"
         private const val TAG = "AppSettingsManager"
         const val KEY_ACCESS_TEXT_SIZE = "access_text_size"

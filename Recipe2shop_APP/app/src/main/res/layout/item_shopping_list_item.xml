@@ -28,6 +28,18 @@
         android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_size_small" />
 
+    <TextView
+        android:id="@+id/shopping_item_info_portions"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:gravity="center"
+        android:text="ⓘ"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:background="@drawable/bg_info_circle"
+        android:textColor="@color/white" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/shopping_item_remove"
         android:layout_width="32dp"
@@ -45,7 +57,6 @@
         app:icon="@drawable/ic_close_24"
         app:iconSize="18dp"
         app:iconPadding="0dp"
-        app:iconGravity="textStart"
         app:iconTint="@color/white"
         app:backgroundTint="@color/error_color"
         app:cornerRadius="18dp" />

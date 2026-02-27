@@ -96,7 +96,7 @@ class PermissionChecker(private val context: Context) {
         val androidPermissions = checkAndroidPermissions()
         
         return buildString {
-            appendLine("=== RAPPORT DE PERMISSIONS THERAPIA ===")
+            appendLine("=== RAPPORT DE PERMISSIONS R2SL ===")
             appendLine("Timestamp: ${java.util.Date()}")
             appendLine()
             

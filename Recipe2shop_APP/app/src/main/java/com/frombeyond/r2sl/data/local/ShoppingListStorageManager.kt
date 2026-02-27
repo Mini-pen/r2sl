@@ -161,13 +161,15 @@ class ShoppingListStorageManager(private val context: Context) {
     data class MealSource(
         val date: String,
         val mealType: String,
-        val recipeName: String
+        val recipeName: String,
+        val quantityNeeded: Double? = null
     ) {
         fun toJson(): JSONObject {
             return JSONObject().apply {
                 put("date", date)
                 put("mealType", mealType)
                 put("recipeName", recipeName)
+                quantityNeeded?.let { put("quantityNeeded", it) }
             }
         }
 
@@ -179,7 +181,8 @@ class ShoppingListStorageManager(private val context: Context) {
                 return MealSource(
                     date = json.getString("date"),
                     mealType = json.getString("mealType"),
-                    recipeName = json.getString("recipeName")
+                    recipeName = json.getString("recipeName"),
+                    quantityNeeded = if (json.has("quantityNeeded")) json.getDouble("quantityNeeded") else null
                 )
             }
         }

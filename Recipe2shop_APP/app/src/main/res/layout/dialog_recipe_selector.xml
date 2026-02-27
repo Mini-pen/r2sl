@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:hint="Rechercher une recette"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="8dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/recipe_search_input"
@@ -21,9 +21,46 @@
             android:imeOptions="actionSearch" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/recipe_selector_filter_favorites"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="☆"
+            android:textSize="20sp"
+            android:contentDescription="Favoris uniquement"
+            app:backgroundTint="@color/primary_blue"
+            app:cornerRadius="24dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/recipe_selector_filter_rating"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:text="🤍"
+            android:textSize="16sp"
+            android:contentDescription="Note minimum"
+            app:backgroundTint="@color/primary_blue"
+            app:cornerRadius="24dp" />
+
+        <TextView
+            android:id="@+id/recipe_selector_filter_rating_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="0+"
+            android:textSize="14sp" />
+    </LinearLayout>
+
     <ListView
         android:id="@+id/recipe_list"
         android:layout_width="match_parent"
-        android:layout_height="400dp" />
+        android:layout_height="360dp" />
 
 </LinearLayout>

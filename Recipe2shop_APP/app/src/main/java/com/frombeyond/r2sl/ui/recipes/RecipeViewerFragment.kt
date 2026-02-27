@@ -12,7 +12,7 @@ import android.util.TypedValue
 import kotlin.math.abs
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.export.RecipeJson
@@ -24,7 +24,7 @@ import com.frombeyond.r2sl.utils.AccessibilityHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 
-class RecipeViewerFragment : Fragment() {
+class RecipeViewerFragment : BaseFragment() {
 
     private lateinit var scrollView: NestedScrollView
     private lateinit var sectionsContainer: LinearLayout
@@ -151,7 +151,13 @@ class RecipeViewerFragment : Fragment() {
                         append(alternatives)
                         ingredient.notes?.let { append(" (").append(it).append(")") }
                     }
-                    addKeyValue(container, "${ingredient.category} - ${ingredient.name}", value)
+                    val emoji = ingredient.emoji?.takeIf { it.isNotEmpty() }
+                        ?: com.frombeyond.r2sl.data.local.IngredientEmojiManager(requireContext()).getSuggestions(ingredient.name).firstOrNull()
+                    val label = buildString {
+                        if (!emoji.isNullOrEmpty()) append(emoji).append(" ")
+                        append(ingredient.category).append(" - ").append(ingredient.name)
+                    }
+                    addKeyValue(container, label, value)
                 }
             }
         )

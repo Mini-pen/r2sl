@@ -54,7 +54,6 @@
             app:icon="@drawable/ic_close_24"
             app:iconSize="18dp"
             app:iconPadding="0dp"
-            app:iconGravity="textStart"
             app:iconTint="@color/white"
             app:backgroundTint="@color/error_color"
             app:cornerRadius="18dp"

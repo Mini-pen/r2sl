@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.ImageView
 import android.graphics.BitmapFactory
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.frombeyond.r2sl.R
@@ -23,7 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
 
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var authManager: GoogleAuthManager

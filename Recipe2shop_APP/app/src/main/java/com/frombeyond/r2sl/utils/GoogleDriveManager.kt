@@ -10,6 +10,7 @@ import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.frombeyond.r2sl.data.BackupPathConfig
+import com.frombeyond.r2sl.data.ProfileStorageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File as AndroidFile
@@ -55,14 +56,19 @@ class GoogleDriveManager(private val context: Context) {
     companion object {
         private const val TAG = "GoogleDriveManager"
         private val SCOPES = listOf(DriveScopes.DRIVE_FILE)
-        private const val THERAPIA_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
+        private const val R2SL_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
     }
     
     private var driveService: Drive? = null
-    private var therapiaFolderId: String? = null
+    private var r2slFolderId: String? = null
     private val backupPathConfig = BackupPathConfig(context)
     private val logManager = LogManager(context)
-    
+
+    /** Last error message from Drive API (for UI). Cleared on success. */
+    private var lastDriveError: String? = null
+
+    fun getLastDriveError(): String? = lastDriveError
+
     // Cache des IDs des dossiers
     private var profileFolderId: String? = null
     private var configFolderId: String? = null
@@ -78,7 +84,7 @@ class GoogleDriveManager(private val context: Context) {
                 GsonFactory(),
                 credential
             )
-                .setApplicationName("TherapIA")
+                .setApplicationName("Recipe2shoplist")
                 .build()
             
             Log.i(TAG, "Service Google Drive initialisé avec succès")
@@ -95,7 +101,8 @@ class GoogleDriveManager(private val context: Context) {
     }
     
     /**
-     * Teste la connexion Google Drive en listant les fichiers
+     * Tests Drive connection by creating/finding the root backup folder.
+     * Avoids files().list() which can return 403 with drive.file scope; create/find works with drive.file.
      */
     suspend fun testConnection(): Boolean = withContext(Dispatchers.IO) {
         try {
@@ -103,34 +110,39 @@ class GoogleDriveManager(private val context: Context) {
                 Log.e(TAG, "Service Google Drive non initialisé pour le test de connexion")
                 return@withContext false
             }
-            
-            Log.i(TAG, "Test de connexion Google Drive en cours...")
-            
-            // Essayer de lister les fichiers (limite à 1 pour le test)
-            val result = driveService!!.files().list()
-                .setPageSize(1)
-                .setFields("nextPageToken, files(id, name)")
-                .execute()
-            
-            Log.i(TAG, "Test de connexion Google Drive réussi - ${result.files?.size ?: 0} fichiers trouvés")
-            return@withContext true
-            
+            Log.i(TAG, "Test de connexion Google Drive (création/récupération dossier racine)...")
+            val rootId = ensureR2slFolder()
+            if (rootId != null) {
+                lastDriveError = null
+                Log.i(TAG, "Test de connexion Google Drive réussi (dossier racine: $rootId)")
+                return@withContext true
+            }
+            lastDriveError = "Impossible de créer ou trouver le dossier de sauvegarde"
+            Log.e(TAG, "Test de connexion Google Drive échoué (ensureR2slFolder a retourné null)")
+            return@withContext false
         } catch (e: Exception) {
+            lastDriveError = when (e) {
+                is com.google.api.client.googleapis.json.GoogleJsonResponseException -> {
+                    when (e.statusCode) {
+                        403 -> "Accès refusé (403). Activez l’API Google Drive dans Google Cloud Console : APIs & Services > Bibliothèque > Google Drive API."
+                        404 -> "API non trouvée. Vérifiez que l’API Google Drive est activée pour ce projet."
+                        else -> "Erreur Google ${e.statusCode}: ${e.message}"
+                    }
+                }
+                else -> e.message ?: "Erreur inconnue"
+            }
             Log.e(TAG, "Test de connexion Google Drive échoué", e)
-            Log.e(TAG, "Type d'erreur: ${e.javaClass.simpleName}")
-            Log.e(TAG, "Message d'erreur: ${e.message}")
             if (e is com.google.api.client.googleapis.json.GoogleJsonResponseException) {
-                Log.e(TAG, "Code d'erreur Google: ${e.statusCode}")
-                Log.e(TAG, "Détails Google: ${e.details}")
+                Log.e(TAG, "Code Google: ${e.statusCode}, Détails: ${e.details}")
             }
             return@withContext false
         }
     }
     
     /**
-     * Crée ou récupère le dossier racine TherapIA dans Google Drive
+     * Crée ou récupère le dossier racine R2SL dans Google Drive
      */
-    suspend fun ensureTherapiaFolder(): String? = withContext(Dispatchers.IO) {
+    suspend fun ensureR2slFolder(): String? = withContext(Dispatchers.IO) {
         try {
             if (driveService == null) {
                 Log.e(TAG, "Service Google Drive non initialisé")
@@ -140,45 +152,60 @@ class GoogleDriveManager(private val context: Context) {
             // Vérifier si le dossier racine existe déjà
             val existingFolder = findFolder(backupPathConfig.rootFolder, null)
             if (existingFolder != null) {
-                therapiaFolderId = existingFolder.id
-                Log.i(TAG, "Dossier racine TherapIA trouvé: ${existingFolder.id}")
+                r2slFolderId = existingFolder.id
+                Log.i(TAG, "Dossier racine R2SL trouvé: ${existingFolder.id}")
                 return@withContext existingFolder.id
             }
             
             // Créer le dossier racine s'il n'existe pas
             val folderMetadata = File().apply {
                 name = backupPathConfig.rootFolder
-                mimeType = THERAPIA_FOLDER_MIME_TYPE
+                mimeType = R2SL_FOLDER_MIME_TYPE
             }
             
             val folder = driveService!!.files().create(folderMetadata)
                 .setFields("id")
                 .execute()
             
-            therapiaFolderId = folder.id
-            Log.i(TAG, "Dossier racine TherapIA créé: ${folder.id}")
+            r2slFolderId = folder.id
+            Log.i(TAG, "Dossier racine R2SL créé: ${folder.id}")
             return@withContext folder.id
             
         } catch (e: Exception) {
-            Log.e(TAG, "Erreur lors de la création/récupération du dossier racine TherapIA", e)
+            lastDriveError = when (e) {
+                is com.google.api.client.googleapis.json.GoogleJsonResponseException -> {
+                    when (e.statusCode) {
+                        403 -> "Accès refusé. Activez l'API Google Drive dans Google Cloud Console."
+                        else -> "Erreur ${e.statusCode}: ${e.message}"
+                    }
+                }
+                else -> e.message
+            }
+            Log.e(TAG, "Erreur lors de la création/récupération du dossier racine R2SL", e)
             return@withContext null
         }
     }
-    
+
     /**
-     * Recherche un dossier par nom et parent
+     * Finds a folder by name and parent. Returns null if not found or on 403 (drive.file scope may not allow list).
      */
     private suspend fun findFolder(folderName: String, parentId: String?): File? = withContext(Dispatchers.IO) {
         try {
             val parentQuery = if (parentId != null) "'$parentId' in parents" else "parents in 'root'"
-            val query = "name='$folderName' and mimeType='$THERAPIA_FOLDER_MIME_TYPE' and trashed=false and $parentQuery"
+            val q = "name='${folderName.replace("'", "\\'")}' and mimeType='$R2SL_FOLDER_MIME_TYPE' and trashed=false and $parentQuery"
             val result: FileList = driveService!!.files().list()
-                .setQ(query)
+                .setQ(q)
                 .setSpaces("drive")
                 .setFields("files(id, name)")
                 .execute()
-            
             return@withContext result.files?.firstOrNull()
+        } catch (e: com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+            if (e.statusCode == 403) {
+                Log.w(TAG, "findFolder: 403 (scope drive.file peut ne pas autoriser list) - on va créer le dossier")
+            } else {
+                Log.e(TAG, "Erreur Google lors de la recherche du dossier: $folderName", e)
+            }
+            return@withContext null
         } catch (e: Exception) {
             Log.e(TAG, "Erreur lors de la recherche du dossier: $folderName", e)
             return@withContext null
@@ -205,7 +232,7 @@ class GoogleDriveManager(private val context: Context) {
             // Créer le dossier s'il n'existe pas
             val folderMetadata = File().apply {
                 name = folderName
-                mimeType = THERAPIA_FOLDER_MIME_TYPE
+                mimeType = R2SL_FOLDER_MIME_TYPE
                 if (parentId != null) {
                     parents = listOf(parentId)
                 }
@@ -230,7 +257,7 @@ class GoogleDriveManager(private val context: Context) {
     suspend fun ensureAllBackupFolders(): Boolean = withContext(Dispatchers.IO) {
         try {
             // Créer/récupérer le dossier racine
-            val rootId = ensureTherapiaFolder()
+            val rootId = ensureR2slFolder()
             if (rootId == null) {
                 Log.e(TAG, "Impossible de créer/récupérer le dossier racine")
                 return@withContext false
@@ -333,18 +360,23 @@ class GoogleDriveManager(private val context: Context) {
             return@withContext true
             
         } catch (e: Exception) {
+            lastDriveError = when (e) {
+                is com.google.api.client.googleapis.json.GoogleJsonResponseException -> {
+                    when (e.statusCode) {
+                        403 -> "Accès refusé (403). Activez l'API Google Drive dans Google Cloud Console."
+                        else -> "Erreur ${e.statusCode}: ${e.message}"
+                    }
+                }
+                else -> e.message ?: "Erreur d'upload"
+            }
             Log.e(TAG, "Erreur lors de l'upload du fichier: ${localFile.name}", e)
-            Log.e(TAG, "Type d'erreur: ${e.javaClass.simpleName}")
-            Log.e(TAG, "Message d'erreur: ${e.message}")
-            Log.e(TAG, "Cause: ${e.cause?.message}")
             if (e is com.google.api.client.googleapis.json.GoogleJsonResponseException) {
-                Log.e(TAG, "Code d'erreur Google: ${e.statusCode}")
-                Log.e(TAG, "Détails Google: ${e.details}")
+                Log.e(TAG, "Code d'erreur Google: ${e.statusCode}, Détails: ${e.details}")
             }
             return@withContext false
         }
     }
-    
+
     /**
      * Types de dossiers de sauvegarde
      */
@@ -359,11 +391,13 @@ class GoogleDriveManager(private val context: Context) {
         try {
             var allSuccess = true
             
-            // Sauvegarder tous les logs avant la sauvegarde
             logManager.saveAllLogs()
-            
-            // Sauvegarder le fichier de profil
+            // * Ensure profile file exists so "backup profile" always uploads something
             val profileFile = AndroidFile(context.filesDir, "therapist_profile.json")
+            if (!profileFile.exists()) {
+                val profileManager = ProfileStorageManager(context)
+                profileManager.saveProfile(profileManager.createDefaultProfile())
+            }
             if (profileFile.exists()) {
                 val fileName = backupPathConfig.generateProfileFileName()
                 val success = uploadFile(
@@ -454,11 +488,13 @@ class GoogleDriveManager(private val context: Context) {
                 if (!success) allSuccess = false
             }
             
+            if (allSuccess) lastDriveError = null
             Log.i(TAG, "Sauvegarde des fichiers de configuration: ${if (allSuccess) "Succès" else "Échec partiel"}")
             Log.i(TAG, "Structure utilisée: ${backupPathConfig.getConfigSummary()}")
             return@withContext allSuccess
-            
+
         } catch (e: Exception) {
+            lastDriveError = e.message ?: "Erreur lors de la sauvegarde"
             Log.e(TAG, "Erreur lors de la sauvegarde des fichiers de configuration", e)
             return@withContext false
         }

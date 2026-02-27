@@ -55,10 +55,20 @@ class MenuStorageManager(private val context: Context) {
         saveMenu(current.copy(assignments = updated))
     }
 
-    fun addDish(date: LocalDate, mealType: String, dishId: String) {
+    fun addDish(date: LocalDate, mealType: String, dishId: String, portions: Int = 1) {
         val current = loadMenu()
         val updated = current.assignments.toMutableList()
-        updated.add(MenuAssignment(date.toString(), mealType, dishId))
+        updated.add(MenuAssignment(date.toString(), mealType, dishId, portions.coerceAtLeast(1)))
+        saveMenu(current.copy(assignments = updated))
+    }
+
+    fun setPortions(date: LocalDate, mealType: String, dishId: String, portions: Int) {
+        val current = loadMenu()
+        val updated = current.assignments.map {
+            if (it.date == date.toString() && it.mealType == mealType && it.dishId == dishId) {
+                it.copy(portions = portions.coerceAtLeast(1))
+            } else it
+        }
         saveMenu(current.copy(assignments = updated))
     }
 
@@ -101,13 +111,15 @@ class MenuStorageManager(private val context: Context) {
     data class MenuAssignment(
         val date: String,
         val mealType: String,
-        val dishId: String
+        val dishId: String,
+        val portions: Int = 1
     ) {
         fun toJson(): JSONObject {
             return JSONObject().apply {
                 put("date", date)
                 put("mealType", mealType)
                 put("dishId", dishId)
+                put("portions", portions)
             }
         }
 
@@ -119,7 +131,8 @@ class MenuStorageManager(private val context: Context) {
                 return MenuAssignment(
                     date = json.getString("date"),
                     mealType = json.getString("mealType"),
-                    dishId = json.getString("dishId")
+                    dishId = json.getString("dishId"),
+                    portions = json.optInt("portions", 1).coerceAtLeast(1)
                 )
             }
         }

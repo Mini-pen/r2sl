@@ -14,7 +14,7 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.local.DishStorageManager
@@ -25,6 +25,7 @@ import com.frombeyond.r2sl.utils.ErrorLogger
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -34,7 +35,7 @@ import java.util.Locale
  * * Fragment for managing weekly menus.
  * Allows users to create weekly menus by associating dishes to meals.
  */
-class WeeklyMenuFragment : Fragment() {
+class WeeklyMenuFragment : BaseFragment() {
 
     private lateinit var buttonWeekView: MaterialButton
     private lateinit var buttonThreeDaysView: MaterialButton
@@ -208,10 +209,21 @@ class WeeklyMenuFragment : Fragment() {
 
     private fun showRecipesDialog(date: LocalDate, mealType: String) {
         try {
-            val allRecipes = recipesFileManager.listRecipeEntries().map { entry ->
-                RecipeChoice(entry.name, entry.fileName)
+            val entries = recipesFileManager.listRecipeEntries()
+            val entriesWithRecipe = entries.mapNotNull { entry ->
+                try {
+                    val file = recipesFileManager.getRecipeFile(entry.fileName) ?: return@mapNotNull null
+                    val format = recipesFileManager.readRecipeFile(file)
+                    val recipe = format.recipes.firstOrNull() ?: return@mapNotNull null
+                    RecipeChoiceWithMeta(entry.name, entry.fileName, recipe.metadata?.favorite ?: false, recipe.metadata?.rating ?: 0)
+                } catch (e: IOException) {
+                    ErrorLogger.getInstance().logError("Erreur lecture recette: ${entry.fileName}", e, "WeeklyMenuFragment")
+                    RecipeChoiceWithMeta(entry.name, entry.fileName, false, 0)
+                } catch (e: Exception) {
+                    null
+                }
             }
-            if (allRecipes.isEmpty()) {
+            if (entriesWithRecipe.isEmpty()) {
                 Toast.makeText(requireContext(), R.string.menu_no_recipes, Toast.LENGTH_SHORT).show()
                 return
             }
@@ -219,35 +231,65 @@ class WeeklyMenuFragment : Fragment() {
             val dialogView = layoutInflater.inflate(R.layout.dialog_recipe_selector, null)
             val searchInput = dialogView.findViewById<TextInputEditText>(R.id.recipe_search_input)
             val recipeList = dialogView.findViewById<ListView>(R.id.recipe_list)
+            val filterFavoritesBtn = dialogView.findViewById<MaterialButton>(R.id.recipe_selector_filter_favorites)
+            val filterRatingBtn = dialogView.findViewById<MaterialButton>(R.id.recipe_selector_filter_rating)
+            val filterRatingLabel = dialogView.findViewById<TextView>(R.id.recipe_selector_filter_rating_label)
 
-            // Adapter pour la liste des recettes
-            val adapter = ArrayAdapter<String>(
-                requireContext(),
-                android.R.layout.simple_list_item_1,
-                allRecipes.map { it.name }
-            )
-            recipeList.adapter = adapter
+            var filterText = ""
+            var filterFavoritesOnly = false
+            var filterMinRating = 0
 
-            // Stocker la liste filtrée actuelle
-            var currentFilteredRecipes = allRecipes.toList()
+            fun applyFilters(): List<RecipeChoiceWithMeta> {
+                return entriesWithRecipe.filter { r ->
+                    val nameOk = r.name.lowercase(Locale.getDefault()).contains(filterText)
+                    val favoriteOk = !filterFavoritesOnly || r.favorite
+                    val ratingOk = r.rating >= filterMinRating
+                    nameOk && favoriteOk && ratingOk
+                }
+            }
 
-            // Filtrer la liste lors de la saisie
+            fun updateList() {
+                val filtered = applyFilters()
+                val adapter = ArrayAdapter<String>(
+                    requireContext(),
+                    android.R.layout.simple_list_item_1,
+                    filtered.map { it.name }
+                )
+                recipeList.adapter = adapter
+            }
+
+            fun updateFilterUi() {
+                filterFavoritesBtn.text = if (filterFavoritesOnly) "⭐" else "☆"
+                filterRatingBtn.text = when (filterMinRating) {
+                    0 -> "🤍"
+                    1 -> "❤️"
+                    2 -> "❤️❤️"
+                    3 -> "❤️❤️❤️"
+                    else -> "🤍"
+                }
+                filterRatingLabel.text = "${filterMinRating}+"
+            }
+
+            filterFavoritesBtn.setOnClickListener {
+                filterFavoritesOnly = !filterFavoritesOnly
+                updateFilterUi()
+                updateList()
+            }
+            filterRatingBtn.setOnClickListener {
+                filterMinRating = (filterMinRating + 1) % 4
+                updateFilterUi()
+                updateList()
+            }
+
+            updateFilterUi()
+            updateList()
+
             searchInput.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
-                    try {
-                        val filter = s?.toString()?.lowercase(Locale.getDefault()) ?: ""
-                        currentFilteredRecipes = allRecipes.filter { recipe ->
-                            recipe.name.lowercase(Locale.getDefault()).contains(filter)
-                        }
-                        val filteredNames = currentFilteredRecipes.map { it.name }
-                        adapter.clear()
-                        adapter.addAll(filteredNames)
-                        adapter.notifyDataSetChanged()
-                    } catch (e: Exception) {
-                        ErrorLogger.getInstance().logError("Erreur lors du filtrage des recettes", e, "WeeklyMenuFragment")
-                    }
+                    filterText = s?.toString()?.lowercase(Locale.getDefault()) ?: ""
+                    updateList()
                 }
             })
 
@@ -259,8 +301,9 @@ class WeeklyMenuFragment : Fragment() {
 
             recipeList.setOnItemClickListener { _, _, position, _ ->
                 try {
-                    if (position >= 0 && position < currentFilteredRecipes.size) {
-                        val choice = currentFilteredRecipes[position]
+                    val filtered = applyFilters()
+                    if (position >= 0 && position < filtered.size) {
+                        val choice = filtered[position]
                         val dish = dishStorage.addDishIfMissing(choice.name, choice.fileName)
                         menuStorage.addDish(date, mealType, dish.id)
                         dialog.dismiss()
@@ -319,20 +362,22 @@ class WeeklyMenuFragment : Fragment() {
         val changeButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_change)
         val viewRecipeButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_view_recipe)
         val addAnotherButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_add_another)
+        val portionsPlusButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_portions_plus)
+        val portionsMinusButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_portions_minus)
+        val portionsText = dialogView.findViewById<TextView>(R.id.dialog_meal_portions)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .setNegativeButton(android.R.string.cancel, null)
             .create()
 
-        // Variable pour suivre l'index actuel
-        var currentIndex = initialIndex.coerceIn(0, assignments.size - 1)
+        var currentAssignments = assignments.toMutableList()
+        var currentIndex = initialIndex.coerceIn(0, currentAssignments.size - 1)
 
-        // Fonction pour mettre à jour l'affichage selon l'index
         fun updateDialogContent(index: Int) {
-            if (index < 0 || index >= assignments.size) return
-            
-            val assignment = assignments[index]
+            if (index < 0 || index >= currentAssignments.size) return
+
+            val assignment = currentAssignments[index]
             val dish = dishStorage.getDishById(assignment.dishId)
             if (dish == null) {
                 Toast.makeText(requireContext(), R.string.meal_dish_not_found, Toast.LENGTH_SHORT).show()
@@ -340,15 +385,30 @@ class WeeklyMenuFragment : Fragment() {
             }
 
             titleText.text = "$mealTypeLabel - ${dish.name}"
+            portionsText.text = assignment.portions.toString()
 
-            // Mettre à jour l'état des flèches
-            val hasMultiple = assignments.size > 1
+            portionsPlusButton.setOnClickListener {
+                val a = currentAssignments.getOrNull(currentIndex) ?: return@setOnClickListener
+                val newPortions = a.portions + 1
+                menuStorage.setPortions(date, mealType, a.dishId, newPortions)
+                currentAssignments[currentIndex] = a.copy(portions = newPortions)
+                portionsText.text = newPortions.toString()
+            }
+            portionsMinusButton.setOnClickListener {
+                val a = currentAssignments.getOrNull(currentIndex) ?: return@setOnClickListener
+                if (a.portions <= 1) return@setOnClickListener
+                val newPortions = a.portions - 1
+                menuStorage.setPortions(date, mealType, a.dishId, newPortions)
+                currentAssignments[currentIndex] = a.copy(portions = newPortions)
+                portionsText.text = newPortions.toString()
+            }
+
+            val hasMultiple = currentAssignments.size > 1
             prevButton.alpha = if (hasMultiple && index > 0) 1.0f else 0.2f
-            nextButton.alpha = if (hasMultiple && index < assignments.size - 1) 1.0f else 0.2f
+            nextButton.alpha = if (hasMultiple && index < currentAssignments.size - 1) 1.0f else 0.2f
             prevButton.isEnabled = hasMultiple && index > 0
-            nextButton.isEnabled = hasMultiple && index < assignments.size - 1
+            nextButton.isEnabled = hasMultiple && index < currentAssignments.size - 1
 
-            // Mettre à jour les listeners des boutons d'action
             deleteButton.setOnClickListener {
                 menuStorage.removeAssignment(date, mealType, assignment.dishId)
                 dialog.dismiss()
@@ -357,7 +417,6 @@ class WeeklyMenuFragment : Fragment() {
 
             changeButton.setOnClickListener {
                 dialog.dismiss()
-                // Supprimer l'ancien et ajouter un nouveau
                 menuStorage.removeAssignment(date, mealType, assignment.dishId)
                 showRecipesDialog(date, mealType)
             }
@@ -381,7 +440,6 @@ class WeeklyMenuFragment : Fragment() {
             }
         }
 
-        // Navigation précédent/suivant
         prevButton.setOnClickListener {
             if (currentIndex > 0) {
                 currentIndex--
@@ -390,7 +448,7 @@ class WeeklyMenuFragment : Fragment() {
         }
 
         nextButton.setOnClickListener {
-            if (currentIndex < assignments.size - 1) {
+            if (currentIndex < currentAssignments.size - 1) {
                 currentIndex++
                 updateDialogContent(currentIndex)
             }
@@ -453,5 +511,5 @@ class WeeklyMenuFragment : Fragment() {
         return date.format(DateTimeFormatter.ofPattern("dd/MM"))
     }
 
-    private data class RecipeChoice(val name: String, val fileName: String)
+    private data class RecipeChoiceWithMeta(val name: String, val fileName: String, val favorite: Boolean, val rating: Int)
 }

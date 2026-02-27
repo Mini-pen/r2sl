@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -311,7 +312,15 @@ class MainActivity : AppCompatActivity() {
         authLogger.logAuthInfo("MAIN_ACTIVITY_RESULT_DATA", "data=${data?.toString()}, dataNull=${data == null}")
         
         Log.d("MainActivity", "onActivityResult: requestCode=$requestCode, resultCode=$resultCode, data=${data?.toString()}")
-        
+        if (requestCode == com.frombeyond.r2sl.ui.settings.SettingsFragment.RC_DRIVE_PERMISSIONS) {
+            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment)
+                ?.childFragmentManager?.primaryNavigationFragment?.let { frag ->
+                    if (frag is com.frombeyond.r2sl.ui.settings.SettingsFragment) {
+                        frag.onActivityResult(requestCode, resultCode, data)
+                    }
+                }
+            return
+        }
         if (requestCode == RC_SIGN_IN) {
             authLogger.logAuthStep("MAIN_ACTIVITY_RC_SIGN_IN_MATCH", "Code de requête correspond à RC_SIGN_IN")
             

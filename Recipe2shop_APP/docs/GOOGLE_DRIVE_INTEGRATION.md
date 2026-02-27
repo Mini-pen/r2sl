@@ -1,8 +1,8 @@
-# 📁 Intégration Google Drive API - TherapIA
+# 📁 Intégration Google Drive API - Recipe2shoplist (R2SL)
 
 ## 📋 Vue d'ensemble
 
-L'intégration Google Drive API permet la sauvegarde automatique des fichiers de configuration, de profil et de logs de l'application TherapIA vers Google Drive. Cette fonctionnalité assure la persistance des données importantes même en cas de réinstallation de l'application.
+L'intégration Google Drive API permet la sauvegarde automatique des fichiers de configuration, de profil et de logs de l'application Recipe2shoplist vers Google Drive. Cette fonctionnalité assure la persistance des données importantes même en cas de réinstallation de l'application.
 
 ## 🔧 Configuration Requise
 
@@ -10,7 +10,7 @@ L'intégration Google Drive API permet la sauvegarde automatique des fichiers de
 
 #### **API à Activer**
 1. Accéder à la [Console Google Cloud](https://console.cloud.google.com/)
-2. Sélectionner le projet TherapIA
+2. Sélectionner le projet Recipe2shoplist
 3. Aller dans **"API et services" > "Bibliothèque"**
 4. Rechercher et activer les API suivantes :
    - **Google Drive API** (v3)
@@ -21,8 +21,8 @@ L'intégration Google Drive API permet la sauvegarde automatique des fichiers de
 2. Cliquer sur **"Créer des identifiants" > "ID client OAuth 2.0"**
 3. Configurer l'écran de consentement OAuth :
    - **Type d'application** : Application Android
-   - **Nom** : TherapIA
-   - **Package** : `com.therapia_solutions.therapia`
+   - **Nom** : Recipe2shoplist (R2SL)
+   - **Package** : `com.frombeyond.r2sl`
    - **Empreinte SHA-1** : [Voir section ci-dessous]
 
 #### **Obtenir l'Empreinte SHA-1**
@@ -31,14 +31,14 @@ L'intégration Google Drive API permet la sauvegarde automatique des fichiers de
 keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
 
 # Pour la clé de release (production)
-keytool -list -v -keystore therapia-release-key.keystore -alias therapia-key-alias
+keytool -list -v -keystore r2sl-release-key.keystore -alias r2sl-key-alias
 ```
 
 ### **2. Console Firebase**
 
 #### **Configuration OAuth**
 1. Aller dans la [Console Firebase](https://console.firebase.google.com/)
-2. Sélectionner le projet TherapIA
+2. Sélectionner le projet Recipe2shoplist
 3. Aller dans **"Authentication" > "Sign-in method"**
 4. Activer **"Google"** comme fournisseur d'authentification
 5. Configurer les paramètres OAuth :
@@ -114,7 +114,7 @@ keytool -list -v -keystore therapia-release-key.keystore -alias therapia-key-ali
 ### **Sécurité des Données**
 - **Chiffrement** : Les données sont chiffrées en transit (HTTPS)
 - **Authentification** : OAuth 2.0 avec Google
-- **Isolation** : Dossier privé "TherapIA_Backup" dans le Drive de l'utilisateur
+- **Isolation** : Dossier privé "R2SL_Backup" dans le Drive de l'utilisateur
 - **Contrôle d'accès** : Seul l'utilisateur connecté peut accéder aux sauvegardes
 
 ## 🛠️ Configuration Technique
@@ -135,9 +135,9 @@ private val SCOPES = listOf(DriveScopes.DRIVE_FILE)
 ### **Structure des Fichiers (Configurable)**
 ```
 Google Drive/
-└── TherapIA/                    # Dossier racine (configurable)
+└── R2SL/                        # Dossier racine (configurable)
     ├── Profile/                 # Dossier profil (configurable)
-    │   └── therapist_profile_20240904_143022.json
+    │   └── user_profile_20240904_143022.json
     ├── Config/                  # Dossier configuration (configurable)
     │   └── app_preferences_20240904_143022.json
     └── Logs/                    # Dossier logs (configurable)
@@ -146,7 +146,7 @@ Google Drive/
 ```
 
 ### **Configuration des Chemins**
-- **Dossier racine** : `TherapIA` (par défaut)
+- **Dossier racine** : `R2SL` (par défaut)
 - **Dossier profil** : `Profile` (par défaut)
 - **Dossier configuration** : `Config` (par défaut)
 - **Dossier logs** : `Logs` (par défaut)

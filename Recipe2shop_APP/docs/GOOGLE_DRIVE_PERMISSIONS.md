@@ -29,7 +29,7 @@ Les scopes OAuth doivent être configurés dans votre **OAuth consent screen** :
 
 Le code doit demander les scopes lors de la connexion Google. Vérifiez que `GoogleAuthManager` demande bien les scopes :
 
-**Fichier** : `app/src/main/java/com/therapia_solutions/therapia/auth/GoogleAuthManager.kt`
+**Fichier** : `app/src/main/java/com/frombeyond/r2sl/auth/GoogleAuthManager.kt`
 
 ```kotlin
 val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

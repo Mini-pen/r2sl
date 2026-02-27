@@ -236,5 +236,12 @@
                 app:cornerRadius="28dp" />
         </LinearLayout>
 
+        <!-- * Extra space at bottom so content can scroll above the keyboard -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@color/background_light"
+            android:minHeight="400dp" />
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -130,7 +130,7 @@ class ConfigurationAssistant(private val context: Context) {
     private fun generateConfigurationGuide(result: ConfigurationManager.ConfigurationResult) {
         try {
             val guide = buildString {
-                appendLine("=== GUIDE DE CONFIGURATION THERAPIA ===")
+                appendLine("=== GUIDE DE CONFIGURATION R2SL ===")
                 appendLine("Généré le : ${java.util.Date()}")
                 appendLine()
                 

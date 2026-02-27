@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.frombeyond.r2sl.ui.BaseFragment
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.AppSettingsManager
 import com.google.android.material.button.MaterialButton
@@ -13,7 +13,7 @@ import com.google.android.material.button.MaterialButton
 /**
  * * Entry point for accessibility settings.
  */
-class AccessibilitySettingsFragment : Fragment() {
+class AccessibilitySettingsFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,

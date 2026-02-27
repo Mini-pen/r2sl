@@ -1,46 +1,37 @@
-# TherapIA - Application de Gestion Thérapeutique
+# Recipe2shoplist (R2SL) - Application de Gestion de Recettes et Listes de Courses
 
 ## 📱 Description
 
-TherapIA est une application Android moderne conçue pour les **thérapeutes et professionnels de santé mentale**. Elle offre une solution complète de gestion de cabinet thérapeutique avec une interface intuitive et des fonctionnalités avancées.
+Recipe2shoplist est une application Android moderne conçue pour **gérer vos recettes et créer automatiquement vos listes de courses**. Elle offre une solution complète de gestion culinaire avec une interface intuitive et des fonctionnalités avancées.
 
 ## ✨ Fonctionnalités Principales
+
+### 📝 **Gestion de Recettes** ✅ IMPLÉMENTÉ
+- **Création et édition** : Interface complète pour créer et modifier des recettes
+- **Métadonnées** : Favoris, notes, dates de création/modification
+- **Export PDF** : Génération de PDF pour partager vos recettes
+- **Import/Export** : Import de packs de recettes et export individuel
+
+### 🛒 **Listes de Courses** ✅ IMPLÉMENTÉ
+- **Génération automatique** : Création depuis les recettes
+- **Gestion des quantités** : Soustraction des quantités restantes à la maison
+- **Marquage des articles** : Cocher les articles achetés ou annulés
+- **Export PDF** : Génération de PDF pour vos listes
+
+### 📅 **Menus Hebdomadaires** ✅ IMPLÉMENTÉ
+- **Planification** : Organisation des repas de la semaine
+- **Navigation multi-repas** : Gestion de plusieurs recettes par créneau
+- **Visualisation** : Vue d'ensemble de la semaine
 
 ### 🔐 **Authentification & Sécurité** ✅ IMPLÉMENTÉ
 - **Connexion Google OAuth 2.0** : Authentification sécurisée via Google
 - **Firebase Authentication** : Gestion des sessions et sécurité
-- **Interface d'authentification** : Boutons de connexion/déconnexion sur tous les écrans
-- **Synchronisation des états** : UI cohérente sur tous les fragments
-
-### 🏠 **Accueil** ✅ IMPLÉMENTÉ
-- **Interface d'accueil** : Message de bienvenue personnalisé
-- **Bouton de connexion** : Authentification Google directement accessible
-- **État d'authentification** : Affichage dynamique selon l'état de connexion
-
-### 📊 **Tableau de Bord** ✅ IMPLÉMENTÉ
-- **Vue d'ensemble** : Interface de base prête pour les statistiques
-- **Navigation** : Intégrée dans le système de navigation principal
-
-### 👥 **Gestion des Patients** ✅ IMPLÉMENTÉ
-- **Interface de base** : Fragment prêt pour la gestion des patients
-- **Navigation** : Intégrée dans le menu principal
-
-### 📅 **Agenda & Planification** ✅ IMPLÉMENTÉ
-- **Interface de base** : Fragment prêt pour la gestion des rendez-vous
-- **Navigation** : Intégrée dans le menu principal
-
-### 🤖 **Sandrine.AI** ✅ IMPLÉMENTÉ
-- **Interface de base** : Fragment prêt pour l'intégration IA
-- **Navigation** : Intégrée dans le menu principal
-
-### 📚 **Bibliothèque de Ressources** ✅ IMPLÉMENTÉ
-- **Interface de base** : Fragment prêt pour les ressources thérapeutiques
-- **Navigation** : Intégrée dans le menu principal
+- **Sauvegarde cloud** : Synchronisation avec Google Drive
 
 ### ⚙️ **Paramètres** ✅ IMPLÉMENTÉ
 - **Gestion du compte** : Affichage des informations utilisateur connecté
-- **Boutons d'authentification** : Connexion/déconnexion intégrés
-- **Interface complète** : Section d'authentification avec profil utilisateur
+- **Accessibilité** : Options d'accessibilité complètes
+- **Développeur** : Outils de diagnostic et maintenance
 
 ## 🏗️ Architecture Technique
 
@@ -61,19 +52,18 @@ TherapIA est une application Android moderne conçue pour les **thérapeutes et 
 ```
 app/
 ├── src/main/
-│   ├── java/com/example/therapia/
-│   │   ├── auth/           # Gestion de l'authentification
-│   │   ├── data/           # Couche de données (Room)
-│   │   ├── ui/             # Interface utilisateur
-│   │   │   ├── home/       # Écran d'accueil
-│   │   │   ├── dashboard/  # Tableau de bord
-│   │   │   ├── patients/   # Gestion des patients
-│   │   │   ├── agenda/     # Planification
-│   │   │   ├── sandrine_ai/# Interface IA
-│   │   │   ├── library/    # Bibliothèque
-│   │   │   └── settings/   # Paramètres
-│   │   └── MainActivity.kt # Activité principale
-│   └── res/                # Ressources (layouts, strings, etc.)
+│   ├── java/com/frombeyond/r2sl/
+│   │   ├── auth/              # Gestion de l'authentification
+│   │   ├── data/              # Couche de données (Room + fichiers JSON)
+│   │   ├── ui/                # Interface utilisateur
+│   │   │   ├── home/          # Écran d'accueil
+│   │   │   ├── recipes/       # Gestion des recettes
+│   │   │   ├── shoppinglists/ # Listes de courses
+│   │   │   ├── weeklymenu/    # Menus hebdomadaires
+│   │   │   ├── accessibility/ # Options d'accessibilité
+│   │   │   └── settings/      # Paramètres
+│   │   └── MainActivity.kt    # Activité principale
+│   └── res/                   # Ressources (layouts, strings, etc.)
 ```
 
 ## 🚀 État d'Avancement
@@ -85,21 +75,24 @@ app/
 - [x] Interface utilisateur de base créée
 - [x] Authentification Google OAuth 2.0 complète
 - [x] Intégration Firebase Auth
-- [x] Synchronisation des états d'authentification
+- [x] Gestion des recettes (CRUD complet)
+- [x] Gestion des listes de courses
+- [x] Menus hebdomadaires
 
-### **🔄 Phase 2 : Fonctionnalités de Base - EN COURS**
-- [x] Interface d'authentification complète
-- [ ] Gestion complète des patients (CRUD)
-- [ ] Système de planification des séances
-- [ ] Prise de notes chiffrées
-- [ ] Sauvegarde et restauration des données
+### **✅ Phase 2 : Fonctionnalités Avancées - TERMINÉE**
+- [x] Métadonnées des recettes (favoris, notes)
+- [x] Export PDF des recettes
+- [x] Import de packs de recettes
+- [x] Options d'accessibilité
+- [x] Sauvegarde et restauration locale
+- [x] Synchronisation Google Drive
 
-### **⏳ Phase 3 : Fonctionnalités Avancées - PLANIFIÉE**
-- [ ] Notifications et rappels
-- [ ] Statistiques et graphiques
-- [ ] Export sécurisé des données
+### **⏳ Phase 3 : Améliorations Futures - PLANIFIÉE**
+- [ ] Synchronisation cloud automatique
+- [ ] Partage de recettes entre utilisateurs
+- [ ] Suggestions de recettes
 - [ ] Mode hors ligne complet
-- [ ] Intégration Sandrine.AI
+- [ ] Statistiques et graphiques
 
 ## 🔧 Configuration et Installation
 
@@ -140,6 +133,6 @@ Ce projet est en développement actif. Les contributions sont les bienvenues !
 
 ---
 
-**Dernière mise à jour** : Décembre 2024  
-**Version actuelle** : 1.0.0 (Authentification complète)  
-**Statut** : Phase 1 terminée, Phase 2 en cours
+**Dernière mise à jour** : Janvier 2025  
+**Version actuelle** : 1.0.0  
+**Statut** : Phase 1 et 2 terminées, Phase 3 planifiée

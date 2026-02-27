@@ -10,7 +10,7 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.export.RecipeJsonFormat
@@ -27,7 +27,7 @@ import java.io.IOException
 /**
  * * Fragment for viewing local JSON recipes.
  */
-class RecipesFragment : Fragment() {
+class RecipesFragment : BaseFragment() {
 
     private lateinit var filesContainer: LinearLayout
     private lateinit var emptyFilesText: TextView

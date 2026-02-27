@@ -16,18 +16,23 @@ import android.widget.Toast
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.button.MaterialButton
 import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.common.api.Scope
+import com.google.api.services.drive.DriveScopes
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseUser
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.auth.GoogleAuthManager
 import com.frombeyond.r2sl.data.AppSettingsManager
 import com.frombeyond.r2sl.data.local.AppDataBackupManager
+import com.frombeyond.r2sl.data.local.IngredientEmojiManager
+import com.frombeyond.r2sl.data.local.RayonsManager
 import com.frombeyond.r2sl.ui.recipes.RecipesLocalFileManager
 import com.frombeyond.r2sl.utils.AuthLogger
 import com.frombeyond.r2sl.utils.ErrorLogger
@@ -39,7 +44,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : BaseFragment() {
 
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var authManager: GoogleAuthManager
@@ -60,6 +65,7 @@ class SettingsFragment : Fragment() {
     private lateinit var btnBackupLocalZip: MaterialButton
     private lateinit var btnRestoreLocalZip: MaterialButton
     private lateinit var btnImportRecipePack: MaterialButton
+    private lateinit var btnLoadDefaultEmojiDict: MaterialButton
     private lateinit var btnRefreshRecipesIndex: MaterialButton
     private lateinit var btnLoadDefaultRecipes: MaterialButton
     private lateinit var btnUpdateRecipesMetadata: MaterialButton
@@ -67,6 +73,10 @@ class SettingsFragment : Fragment() {
     private lateinit var btnClearAppData: MaterialButton
     private lateinit var backupManager: AppDataBackupManager
     private lateinit var recipesFileManager: RecipesLocalFileManager
+    private lateinit var rayonsManager: RayonsManager
+    private lateinit var rayonsListContainer: LinearLayout
+    private lateinit var btnRayonsPrefill: MaterialButton
+    private lateinit var btnRayonsAdd: MaterialButton
     
     // Éléments des logs d'erreurs (mode développeur)
     private lateinit var errorLogsContainer: LinearLayout
@@ -109,6 +119,9 @@ class SettingsFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             uri?.let { importRecipePackFromUri(it) }
         }
+
+    /** Pending Drive action after user grants Drive scopes: "profile" or "settings". */
+    private var pendingDriveAction: String? = null
 
     private lateinit var rootView: View
 
@@ -161,7 +174,12 @@ class SettingsFragment : Fragment() {
         btnBackupLocalZip = root.findViewById(R.id.btn_backup_local_zip)
         btnRestoreLocalZip = root.findViewById(R.id.btn_restore_local_zip)
         btnImportRecipePack = root.findViewById(R.id.btn_import_recipe_pack)
+        btnLoadDefaultEmojiDict = root.findViewById(R.id.btn_load_default_emoji_dict)
+        rayonsListContainer = root.findViewById(R.id.rayons_list_container)
+        btnRayonsPrefill = root.findViewById(R.id.btn_rayons_prefill)
+        btnRayonsAdd = root.findViewById(R.id.btn_rayons_add)
         btnRefreshRecipesIndex = root.findViewById(R.id.btn_refresh_recipes_index)
+        rayonsManager = RayonsManager(requireContext())
         btnLoadDefaultRecipes = root.findViewById(R.id.btn_load_default_recipes)
         btnUpdateRecipesMetadata = root.findViewById(R.id.btn_update_recipes_metadata)
         btnFixRecipesSourcesIngredients = root.findViewById(R.id.btn_fix_recipes_sources_ingredients)
@@ -255,6 +273,12 @@ class SettingsFragment : Fragment() {
 
         btnImportRecipePack.setOnClickListener {
             recipePackImportLauncher.launch(arrayOf("application/zip"))
+        }
+
+        btnLoadDefaultEmojiDict.setOnClickListener {
+            val emojiManager = IngredientEmojiManager(requireContext())
+            val count = emojiManager.loadDefaultFromAssets()
+            Toast.makeText(requireContext(), getString(R.string.settings_emoji_dict_loaded, count), Toast.LENGTH_SHORT).show()
         }
 
         btnRefreshRecipesIndex.setOnClickListener {
@@ -764,6 +788,23 @@ class SettingsFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         
+        if (requestCode == RC_DRIVE_PERMISSIONS) {
+            val action = pendingDriveAction
+            pendingDriveAction = null
+            if (resultCode == android.app.Activity.RESULT_OK) {
+                val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+                if (account != null && GoogleSignIn.hasPermissions(account, *DRIVE_SCOPES.toTypedArray())) {
+                    when (action) {
+                        "profile" -> doBackupProfileToDrive(account)
+                        "settings" -> doBackupSettingsToDrive(account)
+                        else -> doBackupProfileToDrive(account)
+                    }
+                } else {
+                    Toast.makeText(context, "Autorisations Drive refusées ou compte indisponible", Toast.LENGTH_SHORT).show()
+                }
+            }
+            return
+        }
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == android.app.Activity.RESULT_OK && data != null) {
                 // Lancer l'authentification Firebase
@@ -827,19 +868,38 @@ class SettingsFragment : Fragment() {
     }
     
     /**
-     * Sauvegarde le profil sur Google Drive
+     * Sauvegarde le profil sur Google Drive.
+     * Requests Drive scopes incrementally if not already granted (avoids "app not verified" at sign-in).
      */
     private fun backupProfileToDrive() {
         lifecycleScope.launch {
             try {
-                // Vérifier la connexion Google
                 val account = GoogleSignIn.getLastSignedInAccount(requireContext())
                 if (account == null) {
                     Toast.makeText(context, "Veuillez vous connecter avec Google", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
-                
-                // Initialiser Google Drive Manager
+                if (!GoogleSignIn.hasPermissions(account, *DRIVE_SCOPES.toTypedArray())) {
+                    pendingDriveAction = "profile"
+                    GoogleSignIn.requestPermissions(
+                        requireActivity(),
+                        RC_DRIVE_PERMISSIONS,
+                        account,
+                        *DRIVE_SCOPES.toTypedArray()
+                    )
+                    return@launch
+                }
+                doBackupProfileToDrive(account)
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsFragment", "Erreur avant sauvegarde Drive", e)
+                Toast.makeText(context, "Erreur: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun doBackupProfileToDrive(account: GoogleSignInAccount) {
+        lifecycleScope.launch {
+            try {
                 val credential = com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential.usingOAuth2(
                     requireContext(),
                     listOf(
@@ -849,44 +909,29 @@ class SettingsFragment : Fragment() {
                 )
                 credential.selectedAccount = account.account
                 googleDriveManager.initialize(credential)
-                
-                // Vérifier l'initialisation
                 if (!googleDriveManager.isInitialized()) {
-                    android.util.Log.e("SettingsFragment", "Google Drive Manager non initialisé")
-                    Toast.makeText(context, "Erreur: Google Drive Manager non initialisé", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Erreur: Google Drive non initialisé", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
-                
-                android.util.Log.d("SettingsFragment", "Début de la sauvegarde du profil sur Google Drive")
-                
-                // Tester la connexion d'abord
                 val connectionTest = withContext(Dispatchers.IO) {
                     googleDriveManager.testConnection()
                 }
-                
                 if (!connectionTest) {
-                    android.util.Log.e("SettingsFragment", "Test de connexion Google Drive échoué")
-                    Toast.makeText(context, "Erreur: Impossible de se connecter à Google Drive", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, googleDriveManager.getLastDriveError() ?: getString(R.string.drive_connection_error_fallback), Toast.LENGTH_LONG).show()
                     return@launch
                 }
-                
-                android.util.Log.d("SettingsFragment", "Test de connexion Google Drive réussi")
-                
-                // Sauvegarder le profil
                 val success = withContext(Dispatchers.IO) {
                     googleDriveManager.backupConfigurationFiles()
                 }
-                
                 if (success) {
                     Toast.makeText(context, "Profil sauvegardé sur Google Drive avec succès !", Toast.LENGTH_SHORT).show()
-                    android.util.Log.d("SettingsFragment", "Profil sauvegardé sur Google Drive avec succès")
                 } else {
-                    Toast.makeText(context, "Erreur lors de la sauvegarde sur Google Drive", Toast.LENGTH_SHORT).show()
-                    android.util.Log.e("SettingsFragment", "Échec de la sauvegarde sur Google Drive - vérifiez les logs pour plus de détails")
+                    val msg = googleDriveManager.getLastDriveError()
+                        ?: "Erreur lors de la sauvegarde sur Google Drive"
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 }
-                
             } catch (e: Exception) {
-                android.util.Log.e("SettingsFragment", "Erreur lors de la sauvegarde du profil sur Google Drive", e)
+                android.util.Log.e("SettingsFragment", "Erreur sauvegarde profil Drive", e)
                 Toast.makeText(context, "Erreur: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -1079,67 +1124,67 @@ class SettingsFragment : Fragment() {
     }
     
     /**
-     * Sauvegarde les paramètres sur Google Drive
+     * Sauvegarde les paramètres sur Google Drive. Requests Drive scopes if missing.
      */
     private fun backupSettingsToDrive() {
         lifecycleScope.launch {
             try {
-                // Vérifier la connexion Google
                 val account = GoogleSignIn.getLastSignedInAccount(requireContext())
                 if (account == null) {
                     Toast.makeText(context, "Veuillez vous connecter avec Google", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
-                
-                // Initialiser Google Drive Manager
+                if (!GoogleSignIn.hasPermissions(account, *DRIVE_SCOPES.toTypedArray())) {
+                    pendingDriveAction = "settings"
+                    GoogleSignIn.requestPermissions(
+                        requireActivity(),
+                        RC_DRIVE_PERMISSIONS,
+                        account,
+                        *DRIVE_SCOPES.toTypedArray()
+                    )
+                    return@launch
+                }
+                doBackupSettingsToDrive(account)
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsFragment", "Erreur avant sauvegarde paramètres Drive", e)
+                Toast.makeText(context, "Erreur: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun doBackupSettingsToDrive(account: GoogleSignInAccount) {
+        lifecycleScope.launch {
+            try {
                 val credential = com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential.usingOAuth2(
                     requireContext(),
                     listOf(
                         "https://www.googleapis.com/auth/drive.file",
                         "https://www.googleapis.com/auth/drive.metadata.readonly"
                     )
-                    
                 )
                 credential.selectedAccount = account.account
                 googleDriveManager.initialize(credential)
-                
-                // Vérifier l'initialisation
                 if (!googleDriveManager.isInitialized()) {
-                    android.util.Log.e("SettingsFragment", "Google Drive Manager non initialisé")
-                    Toast.makeText(context, "Erreur: Google Drive Manager non initialisé", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Erreur: Google Drive non initialisé", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
-                
-                android.util.Log.d("SettingsFragment", "Début de la sauvegarde des paramètres sur Google Drive")
-                
-                // Tester la connexion d'abord
-                val connectionTest = withContext(Dispatchers.IO) {
-                    googleDriveManager.testConnection()
-                }
-                
+                val connectionTest = withContext(Dispatchers.IO) { googleDriveManager.testConnection() }
                 if (!connectionTest) {
-                    android.util.Log.e("SettingsFragment", "Test de connexion Google Drive échoué")
-                    Toast.makeText(context, "Erreur: Impossible de se connecter à Google Drive", Toast.LENGTH_SHORT).show()
+                    val msg = googleDriveManager.getLastDriveError()
+                        ?: "Impossible de se connecter à Google Drive. Activez l'API Google Drive dans Google Cloud Console."
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                     return@launch
                 }
-                
-                android.util.Log.d("SettingsFragment", "Test de connexion Google Drive réussi")
-                
-                // Sauvegarder les paramètres
-                val success = withContext(Dispatchers.IO) {
-                    googleDriveManager.backupConfigurationFiles()
-                }
-                
+                val success = withContext(Dispatchers.IO) { googleDriveManager.backupConfigurationFiles() }
                 if (success) {
                     Toast.makeText(context, "Paramètres sauvegardés sur Google Drive avec succès !", Toast.LENGTH_SHORT).show()
-                    android.util.Log.d("SettingsFragment", "Paramètres sauvegardés sur Google Drive avec succès")
                 } else {
-                    Toast.makeText(context, "Erreur lors de la sauvegarde sur Google Drive", Toast.LENGTH_SHORT).show()
-                    android.util.Log.e("SettingsFragment", "Échec de la sauvegarde sur Google Drive - vérifiez les logs pour plus de détails")
+                    val msg = googleDriveManager.getLastDriveError()
+                        ?: "Erreur lors de la sauvegarde sur Google Drive"
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 }
-                
             } catch (e: Exception) {
-                android.util.Log.e("SettingsFragment", "Erreur lors de la sauvegarde sur Google Drive", e)
+                android.util.Log.e("SettingsFragment", "Erreur sauvegarde paramètres Drive", e)
                 Toast.makeText(context, "Erreur: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -1148,5 +1193,10 @@ class SettingsFragment : Fragment() {
     
     companion object {
         private const val RC_SIGN_IN = 9001
+        const val RC_DRIVE_PERMISSIONS = 9002
+        private val DRIVE_SCOPES = listOf(
+            Scope(DriveScopes.DRIVE_FILE),
+            Scope("https://www.googleapis.com/auth/drive.metadata.readonly")
+        )
     }
 }

@@ -10,8 +10,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
-import com.google.api.services.drive.DriveScopes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -73,13 +71,12 @@ class GoogleAuthManager(
             
             Log.d(TAG, "Client ID configuré: ${clientId.take(30)}...")
             
+            // * Do not request Drive scopes at sign-in to avoid "app not verified" warning.
+            // * Drive scopes are requested incrementally when user saves to Drive (SettingsFragment).
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(clientId)
                 .requestEmail()
                 .requestProfile()
-                // * Request Google Drive scopes for file access
-                .requestScopes(Scope(DriveScopes.DRIVE_FILE))  // Create and modify files
-                .requestScopes(Scope("https://www.googleapis.com/auth/drive.metadata.readonly"))  // Read metadata
                 .build()
 
             googleSignInClient = GoogleSignIn.getClient(context, gso)

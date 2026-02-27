@@ -61,27 +61,48 @@ class FirebaseConfigManager private constructor(private val context: Context) {
     }
     
     /**
-     * Récupère le Client ID Google pour l'authentification
-     * Priorité : BuildConfig > google-services.json > valeur par défaut
+     * Returns the Client ID to use for requestIdToken() (Google Sign-In / Firebase Auth).
+     * Firebase requires the Web client (OAuth type 3), not the Android client (type 1), to avoid Code 10 / DEVELOPER_ERROR.
+     * Priority: 1) Plugin-generated default_web_client_id (from google-services.json), 2) Web (type 3) from assets JSON, 3) BuildConfig FIREBASE_WEB_CLIENT_ID, 4) Android (type 1) as last resort.
      */
     fun getGoogleClientId(): String? {
-        // 1. Essayer BuildConfig d'abord (priorité)
-        val buildConfigClientId = getClientIdFromBuildConfig()
-        if (!buildConfigClientId.isNullOrEmpty()) {
-            authLogger.logAuthInfo("Client ID", "Client ID récupéré depuis BuildConfig: ${buildConfigClientId.take(20)}...")
-            return buildConfigClientId
+        val webFromRes = getWebClientIdFromGeneratedResources()
+        if (!webFromRes.isNullOrEmpty()) {
+            authLogger.logAuthInfo("Client ID", "Client ID (Web) depuis default_web_client_id: ${webFromRes.take(20)}...")
+            return webFromRes
         }
-        
-        // 2. Fallback vers google-services.json
-        val configClientId = getFirebaseConfig()?.clientId
-        if (!configClientId.isNullOrEmpty()) {
-            authLogger.logAuthInfo("Client ID", "Client ID récupéré depuis google-services.json: ${configClientId.take(20)}...")
-            return configClientId
+        val webFromJson = getWebClientIdFromGoogleServicesAssets()
+        if (!webFromJson.isNullOrEmpty()) {
+            authLogger.logAuthInfo("Client ID", "Client ID (Web type 3) depuis google-services.json (assets): ${webFromJson.take(20)}...")
+            return webFromJson
         }
-        
-        // 3. Aucun Client ID trouvé
-        authLogger.logAuthError("Client ID", "Aucun Client ID valide trouvé. Vérifiez la configuration dans build.gradle.kts")
+        val webFromBuildConfig = getFirebaseWebClientIdFromBuildConfig()
+        if (!webFromBuildConfig.isNullOrEmpty()) {
+            authLogger.logAuthInfo("Client ID", "Client ID (Web) depuis BuildConfig FIREBASE_WEB_CLIENT_ID: ${webFromBuildConfig.take(20)}...")
+            return webFromBuildConfig
+        }
+        val androidFromJson = getAndroidClientIdFromGoogleServicesAssets()
+        if (!androidFromJson.isNullOrEmpty()) {
+            authLogger.logAuthInfo("Client ID", "Client ID (Android type 1, secours) depuis google-services.json: ${androidFromJson.take(20)}...")
+            return androidFromJson
+        }
+        authLogger.logAuthError("Client ID", "Aucun Client ID valide trouvé (Web type 3 ou Android type 1). Vérifiez google-services.json dans app/ et empreintes SHA-1 dans Firebase.")
         return null
+    }
+
+    /**
+     * Returns Web client ID from plugin-generated resource (default_web_client_id).
+     * The Google Services plugin injects the Web client from google-services.json into res/values at build time.
+     */
+    private fun getWebClientIdFromGeneratedResources(): String? {
+        return try {
+            val resId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
+            if (resId != 0) {
+                context.getString(resId).takeIf { it.isNotEmpty() }
+            } else null
+        } catch (e: Exception) {
+            null
+        }
     }
     
     /**
@@ -140,31 +161,34 @@ class FirebaseConfigManager private constructor(private val context: Context) {
     }
     
     /**
-     * Lit la configuration depuis google-services.json
+     * Lit la configuration depuis FirebaseApp.options (traité par le plugin Google Services)
+     * * Le plugin Google Services traite google-services.json au build et injecte les valeurs dans FirebaseApp
      */
     private fun readConfigFromGoogleServices(): FirebaseConfig? {
         return try {
-            // Le fichier google-services.json est traité par le plugin Gradle
-            // et les valeurs sont disponibles via FirebaseApp
+            // * Utiliser FirebaseApp.options qui contient les valeurs traitées par le plugin Google Services
             val firebaseApp = com.google.firebase.FirebaseApp.getInstance()
             val options = firebaseApp.options
             
             val packageName = context.packageName
             
-            // Récupérer les valeurs depuis FirebaseOptions
-            val projectId = options.projectId ?: "therapia-app"
-            // * API Key depuis BuildConfig (chargé depuis local.properties) ou FirebaseOptions
-            val apiKey = getApiKeyFromBuildConfig() ?: options.apiKey ?: ""
-            val applicationId = options.applicationId ?: "1:457686555916:android:fdacd643758143cd00bd29"
-            val storageBucket = options.storageBucket ?: "therapia-app.firebasestorage.app"
+            // * Récupérer les valeurs depuis FirebaseOptions (traitées par le plugin)
+            val projectId = options.projectId ?: return null
+            val projectNumber = extractProjectNumberFromAppId(options.applicationId) ?: return null
+            val storageBucket = options.storageBucket ?: return null
+            val applicationId = options.applicationId ?: return null
             
-            // Pour le client ID, on doit le récupérer depuis google-services.json
-            // car FirebaseOptions ne l'expose pas directement
-            val clientId = getClientIdFromGoogleServices()
+            // * API Key depuis BuildConfig (priorité) ou FirebaseOptions
+            val apiKey = getApiKeyFromBuildConfig() ?: options.apiKey ?: return null
+            
+            // * Client ID depuis BuildConfig (priorité) ou depuis google-services.json via assets
+            val clientId = getClientIdFromBuildConfig() ?: getClientIdFromGoogleServicesAssets() ?: return null
+            
+            authLogger.logAuthInfo("Google Services", "Configuration chargée depuis FirebaseApp.options")
             
             FirebaseConfig(
                 projectId = projectId,
-                projectNumber = "457686555916", // Récupéré depuis google-services.json
+                projectNumber = projectNumber,
                 storageBucket = storageBucket,
                 packageName = packageName,
                 clientId = clientId,
@@ -172,55 +196,99 @@ class FirebaseConfigManager private constructor(private val context: Context) {
                 mobilesdkAppId = applicationId
             )
         } catch (e: Exception) {
-            authLogger.logAuthError("Google Services", "Impossible de lire google-services.json", e)
+            authLogger.logAuthError("Google Services", "Impossible de lire la configuration Firebase", e)
             null
         }
     }
     
     /**
-     * Récupère le Client ID depuis google-services.json ou BuildConfig selon le mode
+     * Extrait le project number depuis l'application ID (format: 1:PROJECT_NUMBER:android:APP_ID)
+     */
+    private fun extractProjectNumberFromAppId(applicationId: String?): String? {
+        return try {
+            applicationId?.split(":")?.getOrNull(1)
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    /** OAuth client_type: 1 = Android, 3 = Web. requestIdToken() must use Web (3). */
+    private fun getOAuthClientsFromGoogleServicesAssets(): List<Pair<Int, String>>? {
+        return try {
+            val inputStream = context.assets.open("google-services.json")
+            val jsonString = inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+            val jsonObject = org.json.JSONObject(jsonString)
+            val clientArray = jsonObject.getJSONArray("client")
+            val androidClient = clientArray.getJSONObject(0)
+            val oauthClientArray = androidClient.getJSONArray("oauth_client")
+            (0 until oauthClientArray.length()).map { i ->
+                val obj = oauthClientArray.getJSONObject(i)
+                obj.getInt("client_type") to obj.getString("client_id")
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** Returns Web client (client_type 3) client_id for requestIdToken(), or null. */
+    private fun getWebClientIdFromGoogleServicesAssets(): String? {
+        val clients = getOAuthClientsFromGoogleServicesAssets() ?: return null
+        return clients.firstOrNull { it.first == 3 }?.second
+    }
+
+    /** Returns Android client (client_type 1) client_id, or null. Used only as last resort. */
+    private fun getAndroidClientIdFromGoogleServicesAssets(): String? {
+        val clients = getOAuthClientsFromGoogleServicesAssets() ?: return null
+        return clients.firstOrNull { it.first == 1 }?.second
+    }
+
+    /**
+     * Récupère le Client ID depuis google-services.json (priorité Web type 3, puis Android type 1).
+     */
+    private fun getClientIdFromGoogleServicesAssets(): String? {
+        return getWebClientIdFromGoogleServicesAssets() ?: getAndroidClientIdFromGoogleServicesAssets()
+    }
+
+    /**
+     * Récupère le Web Client ID depuis BuildConfig (FIREBASE_WEB_CLIENT_ID dans local.properties).
+     */
+    private fun getFirebaseWebClientIdFromBuildConfig(): String? {
+        return try {
+            val buildConfigClass = Class.forName("${context.packageName}.BuildConfig")
+            val webClientId = buildConfigClass.getField("FIREBASE_WEB_CLIENT_ID").get(null) as? String
+            webClientId?.takeIf { it.isNotEmpty() && it != "null" }
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    /**
+     * Récupère le Client ID depuis BuildConfig ou depuis les assets/google-services.json
+     * * Cette méthode est utilisée comme fallback dans createDefaultConfig
      */
     private fun getClientIdFromGoogleServices(): String {
         return try {
             // D'abord, essayer d'utiliser le client ID depuis BuildConfig (si défini)
-            // Cela permet d'utiliser des clients différents pour debug et release
             val buildConfigClientId = getClientIdFromBuildConfig()
             if (!buildConfigClientId.isNullOrEmpty() && buildConfigClientId != "YOUR_DEBUG_CLIENT_ID_HERE" && buildConfigClientId != "YOUR_RELEASE_CLIENT_ID_HERE") {
                 authLogger.logAuthInfo("Client ID", "Utilisation du Client ID depuis BuildConfig")
                 return buildConfigClientId
             }
             
-            // Sinon, lire depuis google-services.json
-            val inputStream = context.assets.open("google-services.json")
-            val jsonString = inputStream.bufferedReader().use { it.readText() }
-            
-            // Parser le JSON pour extraire le client_id
-            val jsonObject = org.json.JSONObject(jsonString)
-            val clientArray = jsonObject.getJSONArray("client")
-            val firstClient = clientArray.getJSONObject(0)
-            val oauthClientArray = firstClient.getJSONArray("oauth_client")
-            
-            // Essayer de trouver le client ID approprié selon le build type
-            val isDebug = com.frombeyond.r2sl.utils.EnvironmentConfig.getInstance(context).isDebugMode()
-            
-            // Parcourir tous les clients OAuth pour trouver celui qui correspond
-            for (i in 0 until oauthClientArray.length()) {
-                val oauthClient = oauthClientArray.getJSONObject(i)
-                val clientId = oauthClient.getString("client_id")
-                // Si on a plusieurs clients, on pourrait les différencier par d'autres critères
-                // Pour l'instant, on prend le premier
-                if (i == 0) {
-                    authLogger.logAuthInfo("Client ID", "Utilisation du Client ID depuis google-services.json")
-                    return clientId
-                }
+            // Sinon, essayer depuis les assets
+            val clientIdFromAssets = getClientIdFromGoogleServicesAssets()
+            if (!clientIdFromAssets.isNullOrEmpty()) {
+                return clientIdFromAssets
             }
             
-            // Fallback
-            authLogger.logAuthError("Client ID", "Aucun Client ID trouvé dans google-services.json")
+            // Fallback : essayer depuis FirebaseApp.options (via applicationId pour déduire)
+            val firebaseApp = com.google.firebase.FirebaseApp.getInstance()
+            val options = firebaseApp.options
+            // Note: FirebaseOptions n'expose pas directement le client ID, donc on retourne vide
+            authLogger.logAuthError("Client ID", "Aucun Client ID trouvé")
             ""
         } catch (e: Exception) {
-            authLogger.logAuthError("Client ID", "Impossible de lire le Client ID depuis google-services.json", e)
-            // Fallback vers BuildConfig ou valeur par défaut
+            authLogger.logAuthError("Client ID", "Impossible de lire le Client ID", e)
             getClientIdFromBuildConfig() ?: ""
         }
     }
@@ -261,23 +329,55 @@ class FirebaseConfigManager private constructor(private val context: Context) {
     }
     
     /**
-     * Crée une configuration par défaut sécurisée
+     * Crée une configuration par défaut en cas d'échec de lecture
+     * * Essaie d'utiliser FirebaseApp.options comme fallback
      */
     private fun createDefaultConfig(): FirebaseConfig {
-        // Utiliser le package name de l'application
-        val packageName = context.packageName
+        // * Essayer d'utiliser FirebaseApp.options comme fallback
+        val configFromFirebase = try {
+            val firebaseApp = com.google.firebase.FirebaseApp.getInstance()
+            val options = firebaseApp.options
+            
+            val projectId = options.projectId
+            val projectNumber = extractProjectNumberFromAppId(options.applicationId)
+            val storageBucket = options.storageBucket
+            val applicationId = options.applicationId
+            val apiKey = getApiKeyFromBuildConfig() ?: options.apiKey
+            val clientId = getClientIdFromBuildConfig() ?: getClientIdFromGoogleServicesAssets()
+            
+            if (projectId != null && projectNumber != null && storageBucket != null && applicationId != null && apiKey != null && clientId != null) {
+                FirebaseConfig(
+                    projectId = projectId,
+                    projectNumber = projectNumber,
+                    storageBucket = storageBucket,
+                    packageName = context.packageName,
+                    clientId = clientId,
+                    apiKey = apiKey,
+                    mobilesdkAppId = applicationId
+                )
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            authLogger.logAuthError("Default Config", "Erreur lors de la lecture de FirebaseApp.options", e)
+            null
+        }
         
-        // Configuration par défaut pour TherapIA
-        // * API Key depuis BuildConfig (chargé depuis local.properties)
-        val apiKey = getApiKeyFromBuildConfig() ?: ""
+        // * Si la lecture depuis FirebaseApp a réussi, retourner cette configuration
+        if (configFromFirebase != null) {
+            return configFromFirebase
+        }
+        
+        // * Fallback final : configuration vide
+        authLogger.logAuthError("Default Config", "Impossible de créer une configuration par défaut - Firebase non configuré")
         return FirebaseConfig(
-            projectId = "therapia-app",
-            projectNumber = "457686555916",
-            storageBucket = "therapia-app.firebasestorage.app",
-            packageName = packageName,
-            clientId = "457686555916-icn3hvgr13soe1gp8gukd6tmtkohgdem.apps.googleusercontent.com",
-            apiKey = apiKey,
-            mobilesdkAppId = "1:457686555916:android:fdacd643758143cd00bd29"
+            projectId = "",
+            projectNumber = "",
+            storageBucket = "",
+            packageName = context.packageName,
+            clientId = "",
+            apiKey = "",
+            mobilesdkAppId = ""
         )
     }
     

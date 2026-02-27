@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class SettingsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "Paramètres\n\nConfiguration de l'application et de Sandrine.AI :\n\n• Profil thérapeute\n• Préférences de l'application\n• Paramètres de sécurité\n• Configuration de Sandrine.AI\n• À propos de TherapIA\n\nFonctionnalité en développement"
+        value = "Paramètres\n\nConfiguration de l'application Recipe2shoplist :\n\n• Compte utilisateur\n• Préférences de l'application\n• Options d'accessibilité\n• Sauvegarde et restauration\n• À propos de Recipe2shoplist"
     }
     val text: LiveData<String> = _text
 }

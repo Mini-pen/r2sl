@@ -23,18 +23,27 @@ object AccessibilityHelper {
     
     /**
      * Applies all accessibility settings to a view and its children recursively.
+     * Clears "applied" tags first so that changing settings takes effect without restart.
      */
     fun applyAccessibilitySettings(context: Context, rootView: View) {
         val settingsManager = AppSettingsManager(context)
-        
         val textSize = settingsManager.getInt(AppSettingsManager.KEY_ACCESS_TEXT_SIZE, 3)
         val uiSize = settingsManager.getInt(AppSettingsManager.KEY_ACCESS_UI_SIZE, 3)
         val contrast = settingsManager.getBoolean(AppSettingsManager.KEY_ACCESS_CONTRAST, false)
         val falc = settingsManager.getBoolean(AppSettingsManager.KEY_ACCESS_FALC, false)
-        
-        // Clear cache when applying to a new root view
+        clearAppliedTags(rootView)
         appliedViews.clear()
         applyToView(rootView, textSize, uiSize, contrast, falc)
+    }
+
+    /** Clears "applied" tags so settings are re-applied with current values. Keeps original_text_size. */
+    private fun clearAppliedTags(view: View) {
+        view.setTag(R.id.accessibility_text_size_applied, null)
+        view.setTag(R.id.accessibility_ui_size_applied, null)
+        view.setTag(R.id.accessibility_contrast_applied, null)
+        if (view is ViewGroup) {
+            view.children.forEach { clearAppliedTags(it) }
+        }
     }
     
     /**
@@ -118,7 +127,11 @@ object AccessibilityHelper {
         // Get original size from XML if not already modified
         val originalSize = textView.getTag(R.id.accessibility_original_text_size) as? Float
             ?: run {
-                val size = textView.textSize / textView.context.resources.displayMetrics.scaledDensity
+                val res = textView.context.resources
+                val density = res.displayMetrics.density
+                val fontScale = res.configuration.fontScale
+                val scaledDensity = density * fontScale
+                val size = textView.textSize / scaledDensity
                 textView.setTag(R.id.accessibility_original_text_size, size)
                 size
             }
@@ -137,6 +150,7 @@ object AccessibilityHelper {
     /**
      * Applies UI size multiplier to icons and buttons.
      * uiSize: 1-5, where 3 is default (1.0x), 1 is 0.7x, 5 is 1.5x
+     * Uses center pivot so scaling does not break icon/text centering.
      */
     private fun applyUiSize(view: View, uiSize: Int) {
         val multiplier = when (uiSize) {
@@ -147,8 +161,8 @@ object AccessibilityHelper {
             5 -> 1.5f
             else -> 1.0f
         }
-        
-        // Apply scale to the view
+        view.pivotX = (view.width / 2).toFloat().takeIf { view.width > 0 } ?: view.pivotX
+        view.pivotY = (view.height / 2).toFloat().takeIf { view.height > 0 } ?: view.pivotY
         view.scaleX = multiplier
         view.scaleY = multiplier
     }

@@ -63,6 +63,8 @@
     <string name="recipes_edit_ingredient_quantity_label">Quantités (ex: 2 g; 1 tasse)</string>
     <string name="recipes_edit_ingredient_notes_label">Notes (optionnel)</string>
     <string name="recipes_edit_ingredient_category_label">Categorie / Rayon</string>
+    <string name="recipes_edit_emoji_search_hint">Rechercher (nom ou emoji)…</string>
+    <string name="drive_connection_error_fallback">Impossible de se connecter à Google Drive. Activez l\'API Google Drive dans Google Cloud Console (APIs &amp; Services &gt; Bibliothèque).</string>
     <string name="recipes_edit_steps_title">Étapes</string>
     <string name="recipes_edit_add_step">Ajouter une étape</string>
     <string name="recipes_edit_remove_step">Supprimer étape</string>

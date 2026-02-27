@@ -1,8 +1,8 @@
-# 🔍 Guide de Diagnostic d'Authentification - TherapIA
+# 🔍 Guide de Diagnostic d'Authentification - Recipe2shoplist (R2SL)
 
 ## 📋 Vue d'ensemble
 
-Ce guide explique comment utiliser le système de diagnostic d'authentification intégré dans TherapIA pour identifier et résoudre les problèmes d'authentification Google et Firebase.
+Ce guide explique comment utiliser le système de diagnostic d'authentification intégré dans Recipe2shoplist pour identifier et résoudre les problèmes d'authentification Google et Firebase.
 
 ## 🚀 Fonctionnalités du Système
 
@@ -27,7 +27,7 @@ Ce guide explique comment utiliser le système de diagnostic d'authentification 
 ## 📱 Utilisation sur l'Appareil
 
 ### **Accès au Diagnostic**
-1. **Ouvrir l'application** TherapIA
+1. **Ouvrir l'application** Recipe2shoplist
 2. **Naviguer vers** le fragment de diagnostic d'authentification
 3. **Utiliser les boutons** :
    - 🚀 **Lancer le Diagnostic** : Exécute toutes les vérifications
@@ -53,13 +53,13 @@ Ce guide explique comment utiliser le système de diagnostic d'authentification 
 ### **1. Incohérence du Package Name**
 ```
 ❌ Configuration Google Sign-In - Incohérence du package name
-   App: com.therapia_solutions.therapia
-   Config: com.example.therapia
+   App: com.frombeyond.r2sl
+   Config: com.example.r2sl
 ```
 
 **Solution** :
 - Télécharger le bon fichier `google-services.json` depuis la console Firebase
-- Vérifier que le package name correspond exactement à `com.therapia_solutions.therapia`
+- Vérifier que le package name correspond exactement à `com.frombeyond.r2sl`
 
 ### **2. Google Play Services Non Disponible**
 ```
@@ -95,7 +95,7 @@ Ce guide explique comment utiliser le système de diagnostic d'authentification 
 
 ### **Emplacement des Logs**
 ```
-/data/data/com.therapia_solutions.therapia/files/logs/auth_errors.log
+/data/data/com.frombeyond.r2sl/files/logs/auth_errors.log
 ```
 
 ### **Format des Logs**
@@ -104,8 +104,8 @@ Ce guide explique comment utiliser le système de diagnostic d'authentification 
 Exception: Exception
 Message: Client ID Google non trouvé dans la configuration
 Stack Trace:
-  at com.therapia_solutions.therapia.auth.GoogleAuthManager.setupGoogleSignIn(GoogleAuthManager.kt:XX)
-  at com.therapia_solutions.therapia.auth.GoogleAuthManager.<init>(GoogleAuthManager.kt:XX)
+  at com.frombeyond.r2sl.auth.GoogleAuthManager.setupGoogleSignIn(GoogleAuthManager.kt:XX)
+  at com.frombeyond.r2sl.auth.GoogleAuthManager.<init>(GoogleAuthManager.kt:XX)
 ```
 
 ## 🛡️ Bonnes Pratiques de Sécurité
@@ -157,11 +157,11 @@ Stack Trace:
 
 ✅ Configuration Firebase
    Message: Firebase initialisé avec succès
-   Détails: Project ID: therapia-app, Storage Bucket: therapia-app.firebasestorage.app
+   Détails: Project ID: recipe2shoplist-8487e, Storage Bucket: recipe2shoplist-8487e.firebasestorage.app
 
 ✅ Configuration Google Sign-In
    Message: Configuration cohérente
-   Détails: Package: com.therapia_solutions.therapia, Client ID: 457686555916-icn3hv...
+   Détails: Package: com.frombeyond.r2sl, Client ID: [Client ID depuis google-services.json]
 
 ✅ Permissions
    Message: Toutes les permissions nécessaires accordées
@@ -178,7 +178,7 @@ Stack Trace:
 📝 LOGS D'ERREUR:
 --------------------
 Les erreurs sont automatiquement enregistrées dans:
-/data/data/com.therapia_solutions.therapia/files/logs/auth_errors.log
+/data/data/com.frombeyond.r2sl/files/logs/auth_errors.log
 
 💡 CONSEILS:
 ---------------

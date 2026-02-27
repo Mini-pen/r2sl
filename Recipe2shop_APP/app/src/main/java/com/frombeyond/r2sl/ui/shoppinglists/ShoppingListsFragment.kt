@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.local.DishStorageManager
@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter
  * * Fragment for managing shopping lists.
  * Displays interactive shopping lists generated from weekly menus.
  */
-class ShoppingListsFragment : Fragment() {
+class ShoppingListsFragment : BaseFragment() {
 
     private lateinit var listsContainer: LinearLayout
     private lateinit var emptyText: TextView
@@ -219,30 +219,33 @@ class ShoppingListsFragment : Fragment() {
                 null
             } ?: return@forEach
 
-            val assignmentDate = LocalDate.parse(assignment.date)
-            val mealSource = ShoppingListStorageManager.MealSource(
-                date = assignment.date,
-                mealType = assignment.mealType,
-                recipeName = recipe.name
-            )
+            val recipeServings = recipe.servings.coerceAtLeast(1)
+            val portionScale = assignment.portions.toDouble() / recipeServings
 
             recipe.ingredients.forEach { ingredient ->
                 val firstAlt = ingredient.quantity.firstOrNull() ?: return@forEach
+                val scaledQty = firstAlt.nb * portionScale
                 val unit = IngredientNormalizer.normalizeUnit(firstAlt.unit)
                 val category = ingredient.category.ifBlank { "Autres" }
                 val key = "${IngredientNormalizer.normalizeName(ingredient.name)}|$unit|$category"
                 val current = itemsMap[key]
-                
-                // Si c'est un item manuel (sans mealSources), on ne le modifie pas
+
                 if (current != null && current.mealSources.isEmpty()) {
                     return@forEach
                 }
-                
-                val quantity = (current?.quantity ?: 0.0) + firstAlt.nb
+
+                val mealSource = ShoppingListStorageManager.MealSource(
+                    date = assignment.date,
+                    mealType = assignment.mealType,
+                    recipeName = recipe.name,
+                    quantityNeeded = scaledQty
+                )
+
+                val quantity = (current?.quantity ?: 0.0) + scaledQty
                 val mealSources = (current?.mealSources ?: emptyList()) + mealSource
                 val checked = current?.checked ?: false
                 val canceled = current?.canceled ?: false
-                
+
                 itemsMap[key] = ShoppingListStorageManager.ShoppingListItem(
                     name = ingredient.name,
                     quantity = quantity,

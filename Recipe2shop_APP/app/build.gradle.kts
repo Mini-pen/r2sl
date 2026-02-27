@@ -6,10 +6,13 @@ plugins {
 }
 
 // * Charger les propriétés locales depuis local.properties
-val localProperties = java.util.Properties()
+import java.util.Properties
+val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.inputStream().use { localProperties.load(it) }
+    localPropertiesFile.inputStream().use { stream ->
+        localProperties.load(stream)
+    }
 }
 
 // * Fonction helper pour lire une propriété avec une valeur par défaut
@@ -25,8 +28,8 @@ android {
         applicationId = "com.frombeyond.r2sl"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,10 +45,12 @@ android {
 
     buildTypes {
         debug {
-            // Client ID pour le mode debug
+            // Client ID pour le mode debug (Android, type 1)
             val debugClientId = getLocalProperty("GOOGLE_CLIENT_ID_DEBUG", "YOUR_DEBUG_CLIENT_ID_HERE")
             buildConfigField("String", "GOOGLE_CLIENT_ID_DEBUG", "\"$debugClientId\"")
-            
+            // Web Client ID (type 3) pour requestIdToken() – évite Code 10 / DEVELOPER_ERROR si default_web_client_id absent
+            val webClientId = getLocalProperty("FIREBASE_WEB_CLIENT_ID", "")
+            buildConfigField("String", "FIREBASE_WEB_CLIENT_ID", if (webClientId.isNotEmpty()) "\"$webClientId\"" else "null")
             // Google API Key
             val apiKey = getLocalProperty("GOOGLE_API_KEY", "")
             buildConfigField("String", "GOOGLE_API_KEY", if (apiKey.isNotEmpty()) "\"$apiKey\"" else "null")
@@ -60,10 +65,12 @@ android {
 
             signingConfig = signingConfigs.getByName("release")
             
-            // Client ID pour le mode release
+            // Client ID pour le mode release (Android, type 1)
             val releaseClientId = getLocalProperty("GOOGLE_CLIENT_ID_RELEASE", "YOUR_RELEASE_CLIENT_ID_HERE")
             buildConfigField("String", "GOOGLE_CLIENT_ID_RELEASE", "\"$releaseClientId\"")
-            
+            // Web Client ID (type 3) pour requestIdToken()
+            val webClientId = getLocalProperty("FIREBASE_WEB_CLIENT_ID", "")
+            buildConfigField("String", "FIREBASE_WEB_CLIENT_ID", if (webClientId.isNotEmpty()) "\"$webClientId\"" else "null")
             // Google API Key
             val apiKey = getLocalProperty("GOOGLE_API_KEY", "")
             buildConfigField("String", "GOOGLE_API_KEY", if (apiKey.isNotEmpty()) "\"$apiKey\"" else "null")
@@ -96,6 +103,33 @@ android {
     packaging {
         resources {
             excludes += setOf("META-INF/DEPENDENCIES", "META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE", "META-INF/NOTICE.txt")
+        }
+    }
+}
+
+// * Tâche post-build pour renommer l'APK release en r2sl.apk
+afterEvaluate {
+    tasks.named("assembleRelease") {
+        doLast {
+            val apkFile = file("build/outputs/apk/release/app-release.apk")
+            val renamedApk = file("build/outputs/apk/release/r2sl.apk")
+            
+            if (apkFile.exists()) {
+                // Supprimer l'ancien fichier r2sl.apk s'il existe
+                if (renamedApk.exists()) {
+                    renamedApk.delete()
+                }
+                
+                // Renommer l'APK
+                val success = apkFile.renameTo(renamedApk)
+                if (success) {
+                    println("✅ APK renommé: ${renamedApk.absolutePath}")
+                } else {
+                    println("❌ Erreur lors du renommage de l'APK")
+                }
+            } else {
+                println("⚠️ APK non trouvé: ${apkFile.absolutePath}")
+            }
         }
     }
 }

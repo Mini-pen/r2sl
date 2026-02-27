@@ -253,7 +253,7 @@ class ConfigurationManager(private val context: Context) {
         val result = checkAndConfigureAll()
         
         return buildString {
-            appendLine("=== RAPPORT DE CONFIGURATION THERAPIA ===")
+            appendLine("=== RAPPORT DE CONFIGURATION R2SL ===")
             appendLine("Timestamp: ${Date()}")
             appendLine()
             

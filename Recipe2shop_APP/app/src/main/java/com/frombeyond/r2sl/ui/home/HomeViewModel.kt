@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class HomeViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "Bienvenue dans TherapIA\n\nVotre application de gestion thérapeutique pour accompagner vos patients dans leur parcours de soin.\n\n• Gérez votre liste de patients\n• Planifiez et suivez vos séances\n• Utilisez Sandrine.AI pour des analyses\n• Accédez à votre bibliothèque de ressources\n\nCommencez par consulter votre tableau de bord ou ajouter un nouveau patient."
+        value = "Bienvenue dans Recipe2shoplist\n\nVotre application de gestion de recettes et de listes de courses.\n\n• Créez et gérez vos recettes\n• Générez automatiquement vos listes de courses\n• Planifiez vos menus de la semaine\n• Exportez vos recettes en PDF\n\nCommencez par créer une recette ou consultez votre menu de la semaine."
     }
     val text: LiveData<String> = _text
 }

@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.frombeyond.r2sl.ui.BaseFragment
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.AppSettingsManager
 import com.google.android.material.button.MaterialButton
@@ -15,7 +15,7 @@ import com.google.android.material.button.MaterialButton
  * Assistant d'accessibilité avec écrans successifs pour chaque question.
  * Réutilise les layouts existants avec navigation par flèches.
  */
-class AccessibilityWizardFragment : Fragment() {
+class AccessibilityWizardFragment : BaseFragment() {
 
     private lateinit var appSettingsManager: AppSettingsManager
     

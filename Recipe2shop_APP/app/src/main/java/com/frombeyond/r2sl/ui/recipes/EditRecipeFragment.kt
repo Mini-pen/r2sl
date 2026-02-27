@@ -2,13 +2,18 @@ package com.frombeyond.r2sl.ui.recipes
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
 import androidx.appcompat.app.AlertDialog
 import com.frombeyond.r2sl.R
@@ -19,7 +24,9 @@ import com.frombeyond.r2sl.data.export.RecipeMetadataJson
 import com.frombeyond.r2sl.data.export.RecipeStepJson
 import com.frombeyond.r2sl.data.export.StepIngredientJson
 import com.frombeyond.r2sl.data.export.SubStepJson
+import com.frombeyond.r2sl.data.local.IngredientEmojiManager
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.io.IOException
@@ -30,7 +37,7 @@ import java.util.UUID
 /**
  * * Fragment for creating or editing a recipe JSON file.
  */
-class EditRecipeFragment : Fragment() {
+class EditRecipeFragment : BaseFragment() {
 
     private lateinit var fileManager: RecipesLocalFileManager
     private var editingFileName: String? = null
@@ -152,19 +159,113 @@ class EditRecipeFragment : Fragment() {
         val quantityInput = row.findViewById<TextInputEditText>(R.id.input_ingredient_quantities)
         val notesInput = row.findViewById<TextInputEditText>(R.id.input_ingredient_notes)
         val categoryInput = row.findViewById<TextInputEditText>(R.id.input_ingredient_category)
+        val emojiDisplay = row.findViewById<android.widget.TextView>(R.id.ingredient_emoji_display)
         val removeButton = row.findViewById<MaterialButton>(R.id.button_remove_ingredient)
+
+        val emojiManager = IngredientEmojiManager(requireContext())
 
         existing?.let {
             nameInput.setText(it.name)
             quantityInput.setText(it.quantity.joinToString("; ") { alt -> "${alt.nb} ${alt.unit}" })
             notesInput.setText(it.notes ?: "")
             categoryInput.setText(it.category)
+            emojiDisplay.text = it.emoji?.takeIf { e -> e.isNotEmpty() } ?: emojiManager.getSuggestions(it.name).firstOrNull() ?: "📦"
+        } ?: run {
+            emojiDisplay.text = "📦"
+        }
+
+        nameInput.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val name = nameInput.text?.toString()?.trim().orEmpty()
+                val suggestion = emojiManager.getSuggestions(name).firstOrNull()
+                emojiDisplay.text = suggestion?.takeIf { it.isNotEmpty() } ?: "📦"
+            }
+        }
+
+        emojiDisplay.setOnClickListener {
+            showEmojiPickerForIngredient(nameInput, emojiDisplay, emojiManager)
         }
 
         removeButton.setOnClickListener {
             ingredientsContainer.removeView(row)
         }
         ingredientsContainer.addView(row)
+    }
+
+    private fun showEmojiPickerForIngredient(
+        nameInput: TextInputEditText,
+        emojiDisplay: android.widget.TextView,
+        emojiManager: IngredientEmojiManager
+    ) {
+        val currentName = nameInput.text?.toString()?.trim().orEmpty()
+        val allEntries = buildEmojiNameList(emojiManager, currentName)
+        val adapter = object : ArrayAdapter<Pair<String, String>>(
+            requireContext(),
+            R.layout.item_emoji_picker_row,
+            R.id.emoji_row_name,
+            allEntries
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
+                val row = convertView ?: layoutInflater.inflate(R.layout.item_emoji_picker_row, parent, false)
+                val item = getItem(position) ?: return row
+                row.findViewById<TextView>(R.id.emoji_row_emoji).text = item.first
+                row.findViewById<TextView>(R.id.emoji_row_name).text = item.second
+                return row
+            }
+        }
+        val dialogView = layoutInflater.inflate(R.layout.dialog_emoji_picker, null)
+        val searchInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.emoji_picker_search)
+        val listView = dialogView.findViewById<ListView>(R.id.emoji_picker_list)
+        listView.adapter = adapter
+        var filteredEntries: List<Pair<String, String>> = allEntries
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString()?.trim()?.lowercase(java.util.Locale.getDefault()).orEmpty()
+                filteredEntries = if (query.isEmpty()) allEntries
+                else allEntries.filter { (emoji, name) ->
+                    name.lowercase(java.util.Locale.getDefault()).contains(query) || emoji.contains(query)
+                }
+                adapter.clear()
+                adapter.addAll(filteredEntries.toMutableList())
+                adapter.notifyDataSetChanged()
+            }
+        })
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.recipes_edit_ingredient_emoji_title))
+            .setView(dialogView)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        listView.setOnItemClickListener { _, _, position, _ ->
+            (adapter.getItem(position))?.let { (emoji, _) ->
+                emojiDisplay.text = emoji
+            }
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    /** Builds list of (emoji, name) from manager, suggestions first then rest, with fallback defaults. */
+    private fun buildEmojiNameList(emojiManager: IngredientEmojiManager, ingredientName: String): MutableList<Pair<String, String>> {
+        val all = emojiManager.getAll()
+        val suggestions = emojiManager.getSuggestions(ingredientName).toSet()
+        val entries = all.entries
+            .filter { it.value.isNotEmpty() }
+            .map { it.value to it.key }
+            .sortedBy { (_, n) -> n.lowercase(java.util.Locale.getDefault()) }
+            .toMutableList()
+        val reordered = entries.partition { (e, _) -> e in suggestions }
+        val result = (reordered.first + reordered.second).distinct().toMutableList()
+        if (result.isEmpty()) {
+            result.addAll(
+                listOf(
+                    "📦" to "colis", "🥕" to "carotte", "🥚" to "œuf", "🥛" to "lait",
+                    "🧂" to "sel", "🍅" to "tomate", "🧅" to "oignon", "🌿" to "herbes"
+                )
+            )
+        }
+        return result
     }
 
     private fun addStepRow(existing: RecipeStepJson?) {
@@ -389,12 +490,15 @@ class EditRecipeFragment : Fragment() {
                     continue
                 }
                 val category = categoryInput.text?.toString()?.trim().orEmpty()
+                val emojiDisplay = row.findViewById<android.widget.TextView>(R.id.ingredient_emoji_display)
+                val emojiStr = emojiDisplay.text?.toString()?.trim()?.takeIf { it.isNotEmpty() && it != "📦" }
                 ingredients.add(
                     com.frombeyond.r2sl.data.export.IngredientJson(
                         name = name,
                         category = if (category.isEmpty()) DEFAULT_CATEGORY else category,
                         quantity = alternatives,
-                        notes = notesInput.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+                        notes = notesInput.text?.toString()?.trim()?.takeIf { it.isNotEmpty() },
+                        emoji = emojiStr
                     )
                 )
             } catch (_: IllegalArgumentException) {

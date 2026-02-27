@@ -19,7 +19,7 @@ class BackupPathConfig(context: Context) {
         private const val KEY_TIMESTAMP_FORMAT = "timestamp_format"
         
         // Chemins par défaut
-        private const val DEFAULT_ROOT_FOLDER = "TherapIA"
+        private const val DEFAULT_ROOT_FOLDER = "R2SL"
         private const val DEFAULT_PROFILE_FOLDER = "Profile"
         private const val DEFAULT_CONFIG_FOLDER = "Config"
         private const val DEFAULT_LOGS_FOLDER = "Logs"

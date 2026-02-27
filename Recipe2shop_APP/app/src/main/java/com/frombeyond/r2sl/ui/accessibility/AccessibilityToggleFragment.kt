@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.frombeyond.r2sl.ui.BaseFragment
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.AppSettingsManager
 import com.google.android.material.button.MaterialButton
@@ -15,7 +15,7 @@ import com.google.android.material.button.MaterialButton
 /**
  * * Full screen toggle setting (enable/disable + validate).
  */
-class AccessibilityToggleFragment : Fragment() {
+class AccessibilityToggleFragment : BaseFragment() {
 
     private lateinit var appSettingsManager: AppSettingsManager
     private lateinit var titleText: TextView

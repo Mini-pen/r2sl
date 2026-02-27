@@ -10,9 +10,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
+import com.frombeyond.r2sl.ui.BaseFragment
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.export.ShoppingListPdfGenerator
+import com.frombeyond.r2sl.data.local.IngredientEmojiManager
 import com.frombeyond.r2sl.data.local.ShoppingListStorageManager
 import com.frombeyond.r2sl.utils.CategoryEmojiHelper
 import com.frombeyond.r2sl.utils.IngredientNormalizer
@@ -24,7 +25,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-class ShoppingListDetailFragment : Fragment() {
+class ShoppingListDetailFragment : BaseFragment() {
 
     private lateinit var storageManager: ShoppingListStorageManager
     private lateinit var itemsContainer: LinearLayout
@@ -39,6 +40,7 @@ class ShoppingListDetailFragment : Fragment() {
 
     private var listId: String? = null
     private var listEntry: ShoppingListStorageManager.ShoppingListEntry? = null
+    private val emojiManager by lazy { IngredientEmojiManager(requireContext()) }
 
     private val exportPdfLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
         if (uri != null) {
@@ -143,8 +145,25 @@ class ShoppingListDetailFragment : Fragment() {
         val removeButton = itemView.findViewById<MaterialButton>(R.id.shopping_item_remove)
 
         checkbox.isChecked = item.checked
-        nameText.text = item.name
-        quantityText.text = "${IngredientNormalizer.formatQuantity(item.quantity)} ${IngredientNormalizer.normalizeUnit(item.unit)}"
+        val ingredientEmoji = emojiManager.getSuggestions(item.name).firstOrNull()
+        nameText.text = if (!ingredientEmoji.isNullOrEmpty()) "$ingredientEmoji ${item.name}" else item.name
+
+        val displayQty = if (item.mealSources.isNotEmpty()) {
+            kotlin.math.ceil(item.quantity).toInt().toString()
+        } else {
+            IngredientNormalizer.formatQuantity(item.quantity)
+        }
+        quantityText.text = "$displayQty ${IngredientNormalizer.normalizeUnit(item.unit)}"
+
+        val infoPortionsView = itemView.findViewById<TextView>(R.id.shopping_item_info_portions)
+        val hasFractionalPortions = item.mealSources.any { source ->
+            val q = source.quantityNeeded ?: 0.0
+            kotlin.math.abs(q - q.toLong().toDouble()) > 1e-6
+        }
+        infoPortionsView.visibility = if (hasFractionalPortions) View.VISIBLE else View.GONE
+        infoPortionsView.setOnClickListener {
+            showPortionsInfoDialog(item)
+        }
 
         val isCanceled = item.canceled
         checkbox.isEnabled = !isCanceled
@@ -199,6 +218,7 @@ class ShoppingListDetailFragment : Fragment() {
     }
 
     private fun showMealSourcesDialog(item: ShoppingListStorageManager.ShoppingListItem) {
+        val unit = IngredientNormalizer.normalizeUnit(item.unit)
         val mealSourcesText = item.mealSources.map { source ->
             val date = LocalDate.parse(source.date)
             val dayName = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.FRENCH).replaceFirstChar { it.uppercase() }
@@ -208,12 +228,27 @@ class ShoppingListDetailFragment : Fragment() {
             } else {
                 getString(R.string.weekly_menu_dinner)
             }
-            "$dayName $dateShort - $mealTypeLabel - ${source.recipeName}"
+            val qtyStr = source.quantityNeeded?.let { IngredientNormalizer.formatQuantityOneDecimal(it) } ?: ""
+            val qtyPart = if (qtyStr.isNotEmpty()) "$qtyStr $unit – " else ""
+            "$qtyPart${source.recipeName} ($dayName $dateShort – $mealTypeLabel)"
         }.joinToString("\n")
 
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle(item.name)
             .setMessage(mealSourcesText)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+    }
+
+    private fun showPortionsInfoDialog(item: ShoppingListStorageManager.ShoppingListItem) {
+        val unit = IngredientNormalizer.normalizeUnit(item.unit)
+        val lines = item.mealSources.map { source ->
+            val qty = source.quantityNeeded ?: 0.0
+            getString(R.string.shopping_list_portions_info_line, IngredientNormalizer.formatQuantityOneDecimal(qty), unit, source.recipeName)
+        }
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(item.name)
+            .setMessage(getString(R.string.shopping_list_portions_info_title) + "\n\n" + lines.joinToString("\n"))
             .setPositiveButton(android.R.string.ok, null)
             .show()
     }

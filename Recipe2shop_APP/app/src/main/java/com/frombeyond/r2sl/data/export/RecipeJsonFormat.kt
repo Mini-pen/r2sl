@@ -159,7 +159,7 @@ data class RecipeJson(
                 id = json.getString("id"),
                 name = json.getString("name"),
                 description = json.optString("description").takeIf { it.isNotEmpty() },
-                servings = json.getInt("servings"),
+                servings = json.optInt("servings", 1).coerceAtLeast(1),
                 workTime = json.optInt("workTime").takeIf { it > 0 },
                 prepTime = json.optInt("prepTime").takeIf { it > 0 },
                 cookTime = json.optInt("cookTime").takeIf { it > 0 },
@@ -225,7 +225,8 @@ data class IngredientJson(
     val name: String,
     val category: String,
     val quantity: List<QuantityAlternative>, // List of quantity alternatives
-    val notes: String?
+    val notes: String?,
+    val emoji: String? = null
 ) {
     fun toJsonObject(): JSONObject {
         return JSONObject().apply {
@@ -239,6 +240,7 @@ data class IngredientJson(
             put("quantity", quantityArray)
             
             notes?.let { put("notes", it) }
+            emoji?.let { put("emoji", it) }
         }
     }
     
@@ -247,6 +249,7 @@ data class IngredientJson(
             val name = json.getString("name")
             val category = json.optString("category", "").ifBlank { "Autres" }
             val notes = json.optString("notes").takeIf { it.isNotEmpty() }
+            val emoji = json.optString("emoji").takeIf { it.isNotEmpty() }
             
             val quantityArray = json.getJSONArray("quantity")
             val alternatives = mutableListOf<QuantityAlternative>()
@@ -258,7 +261,8 @@ data class IngredientJson(
                 name = name,
                 category = category,
                 quantity = alternatives,
-                notes = notes
+                notes = notes,
+                emoji = emoji
             )
         }
     }

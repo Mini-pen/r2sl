@@ -1,6 +1,7 @@
 package com.frombeyond.r2sl.utils
 
 import java.text.Normalizer
+import java.util.Locale
 import kotlin.math.abs
 
 object IngredientNormalizer {
@@ -21,6 +22,19 @@ object IngredientNormalizer {
             value.toInt().toString()
         } else {
             value.toString()
+        }
+    }
+
+    /**
+     * Formats quantity with at most 1 decimal place (for info/portions display).
+     * Rounds to 1 decimal; shows integer when value is whole.
+     */
+    fun formatQuantityOneDecimal(value: Double): String {
+        val rounded = kotlin.math.round(value * 10.0) / 10.0
+        return if (abs(rounded - rounded.toLong().toDouble()) < 0.001) {
+            rounded.toLong().toString()
+        } else {
+            "%.1f".format(Locale.ROOT, rounded)
         }
     }
 

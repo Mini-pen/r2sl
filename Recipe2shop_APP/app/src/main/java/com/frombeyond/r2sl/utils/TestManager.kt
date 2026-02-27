@@ -1844,7 +1844,7 @@ class TestManager(private val context: Context) {
     }
     
     /**
-     * Exporte les logs vers Google Drive dans le dossier Therapia/Logs
+     * Exporte les logs vers Google Drive dans le dossier R2SL/Logs
      */
     suspend fun exportTestLogs(): Boolean = withContext(Dispatchers.IO) {
         try {

@@ -36,8 +36,12 @@
                         android:id="@+id/button_search_recipe"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
                         android:contentDescription="@string/recipes_search"
                         app:icon="@drawable/ic_search"
+                        app:iconSize="24dp"
+                        app:iconPadding="0dp"
                         app:iconGravity="textStart"
                         style="@style/Widget.Material3.Button.Icon" />
 
@@ -50,8 +54,11 @@
                         android:id="@+id/button_filter_recipe"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
                         android:text="@string/recipes_filter"
                         app:icon="@android:drawable/ic_menu_sort_by_size"
+                        app:iconSize="24dp"
                         app:iconGravity="textStart"
                         style="@style/Widget.Material3.Button" />
 
@@ -59,6 +66,8 @@
                         android:id="@+id/button_filter_favorites"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
                         android:layout_marginStart="8dp"
                         android:text="☆"
                         android:textSize="20sp"
@@ -70,6 +79,8 @@
                         android:id="@+id/button_filter_rating"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
                         android:layout_marginStart="8dp"
                         android:text="🤍"
                         android:textSize="16sp"
@@ -79,11 +90,13 @@
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/button_new_recipe"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
                         android:contentDescription="@string/recipes_new_recipe"
                         app:srcCompat="@drawable/ic_add_24"
+                        app:fabSize="mini"
                         app:backgroundTint="@color/primary_blue" />
                 </LinearLayout>
 

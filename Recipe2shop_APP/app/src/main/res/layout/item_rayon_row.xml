@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="6dp">
+
+    <TextView
+        android:id="@+id/item_rayon_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:textColor="@color/text_primary" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/item_rayon_remove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:contentDescription="Supprimer ce rayon"
+        android:padding="0dp"
+        app:icon="@drawable/ic_delete_24"
+        app:iconSize="20dp"
+        app:iconPadding="0dp"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/error_color"
+        app:cornerRadius="20dp" />
+</LinearLayout>
