@@ -1,5 +1,10 @@
 package com.frombeyond.r2sl.ui.recipes
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -8,11 +13,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
 import androidx.appcompat.app.AlertDialog
@@ -21,10 +30,14 @@ import com.frombeyond.r2sl.data.export.QuantityAlternative
 import com.frombeyond.r2sl.data.export.RecipeJson
 import com.frombeyond.r2sl.data.export.RecipeJsonFormat
 import com.frombeyond.r2sl.data.export.RecipeMetadataJson
+import com.frombeyond.r2sl.data.export.RecipePackageService
 import com.frombeyond.r2sl.data.export.RecipeStepJson
+import com.frombeyond.r2sl.data.local.RecipeImageStorageManager
 import com.frombeyond.r2sl.data.export.StepIngredientJson
 import com.frombeyond.r2sl.data.export.SubStepJson
 import com.frombeyond.r2sl.data.local.IngredientEmojiManager
+import com.frombeyond.r2sl.data.local.RayonsManager
+import com.frombeyond.r2sl.utils.RayonPickerHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -64,8 +77,53 @@ class EditRecipeFragment : BaseFragment() {
     private lateinit var saveBottomButton: MaterialButton
     private lateinit var exportTopButton: MaterialButton
     private lateinit var exportBottomButton: MaterialButton
+    private lateinit var recipePrimaryPhotoPreview: ImageView
+    private lateinit var recipePhotosThumbnails: LinearLayout
+    private lateinit var addRecipePhotoButton: MaterialButton
 
-    private val exportRecipeLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+    private lateinit var imageStorageManager: RecipeImageStorageManager
+    private lateinit var rayonsManager: RayonsManager
+    private var recipePhotoDraft = RecipePhotoDraft()
+    private var pendingPhotoTarget: PhotoAddTarget? = null
+    private var pendingCameraAfterPermission = false
+    private var cameraOutputUri: Uri? = null
+
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            uri?.let { openCropEditor(it) }
+        }
+
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                cameraOutputUri?.let { openCropEditor(it) }
+            }
+        }
+
+    private val cropEditorLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode != Activity.RESULT_OK) {
+                return@registerForActivityResult
+            }
+            val croppedUri = result.data?.getStringExtra(RecipeImageCropEditorActivity.EXTRA_CROPPED_URI)
+            if (!croppedUri.isNullOrBlank()) {
+                handleCroppedImage(Uri.parse(croppedUri))
+            }
+        }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
+            val cameraGranted = grants[Manifest.permission.CAMERA] == true
+            if (pendingCameraAfterPermission && cameraGranted) {
+                pendingCameraAfterPermission = false
+                launchCameraCapture()
+            } else if (pendingCameraAfterPermission) {
+                pendingCameraAfterPermission = false
+                Toast.makeText(requireContext(), R.string.recipe_photo_permission_denied, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private val exportRecipeLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         if (uri != null) {
             exportRecipeToUri(uri)
         }
@@ -78,6 +136,8 @@ class EditRecipeFragment : BaseFragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_edit_recipe, container, false)
         fileManager = RecipesLocalFileManager(requireContext())
+        imageStorageManager = RecipeImageStorageManager(requireContext())
+        rayonsManager = RayonsManager(requireContext())
 
         nameLayout = root.findViewById(R.id.input_layout_recipe_name)
         nameInput = root.findViewById(R.id.input_recipe_name)
@@ -100,6 +160,14 @@ class EditRecipeFragment : BaseFragment() {
         saveBottomButton = root.findViewById(R.id.button_save_recipe_bottom)
         exportTopButton = root.findViewById(R.id.button_export_recipe_top)
         exportBottomButton = root.findViewById(R.id.button_export_recipe_bottom)
+        recipePrimaryPhotoPreview = root.findViewById(R.id.recipe_primary_photo_preview)
+        recipePhotosThumbnails = root.findViewById(R.id.recipe_photos_thumbnails)
+        addRecipePhotoButton = root.findViewById(R.id.button_add_recipe_photo)
+
+        addRecipePhotoButton.setOnClickListener {
+            pendingPhotoTarget = PhotoAddTarget.RecipeLevel
+            showPhotoSourceDialog()
+        }
 
         addIngredientButton.setOnClickListener { addIngredientRow(null) }
         addStepButton.setOnClickListener { addStepRow(null) }
@@ -141,6 +209,13 @@ class EditRecipeFragment : BaseFragment() {
             cookTimeInput.setText(recipe.cookTime?.toString() ?: "")
             totalTimeInput.setText(recipe.totalTime?.toString() ?: "")
 
+            recipePhotoDraft = RecipePhotoDraft.fromRecipe(
+                recipe.imageFiles,
+                recipe.primaryImageFile,
+                recipe.imageUrl
+            )
+            refreshRecipePhotosUi()
+
             ingredientsContainer.removeAllViews()
             recipe.ingredients.forEach { addIngredientRow(it) }
 
@@ -168,10 +243,17 @@ class EditRecipeFragment : BaseFragment() {
             nameInput.setText(it.name)
             quantityInput.setText(it.quantity.joinToString("; ") { alt -> "${alt.nb} ${alt.unit}" })
             notesInput.setText(it.notes ?: "")
-            categoryInput.setText(it.category)
+            categoryInput.setText(it.category.ifBlank { RayonsManager.DEFAULT_CATEGORY })
             emojiDisplay.text = it.emoji?.takeIf { e -> e.isNotEmpty() } ?: emojiManager.getSuggestions(it.name).firstOrNull() ?: "📦"
         } ?: run {
             emojiDisplay.text = "📦"
+            categoryInput.setText(RayonsManager.DEFAULT_CATEGORY)
+        }
+
+        categoryInput.setOnClickListener {
+            RayonPickerHelper.show(requireContext(), rayonsManager, categoryInput.text?.toString()) { selected ->
+                categoryInput.setText(selected)
+            }
         }
 
         nameInput.setOnFocusChangeListener { _, hasFocus ->
@@ -278,6 +360,19 @@ class EditRecipeFragment : BaseFragment() {
         val subStepsContainer = row.findViewById<LinearLayout>(R.id.substeps_container)
         val addSubStepButton = row.findViewById<MaterialButton>(R.id.button_add_substep)
         val removeStepButton = row.findViewById<MaterialButton>(R.id.button_remove_step)
+        val stepPhotosThumbnails = row.findViewById<LinearLayout>(R.id.step_photos_thumbnails)
+        val addStepPhotoButton = row.findViewById<MaterialButton>(R.id.button_add_step_photo)
+
+        val stepPhotoDraft = existing?.let {
+            RecipePhotoDraft.fromStep(it.imageFiles, it.primaryImageFile)
+        } ?: RecipePhotoDraft()
+        row.setTag(R.id.tag_step_photo_draft, stepPhotoDraft)
+
+        addStepPhotoButton.setOnClickListener {
+            pendingPhotoTarget = PhotoAddTarget.StepLevel(row)
+            showPhotoSourceDialog()
+        }
+        refreshStepPhotosUi(row, stepPhotoDraft)
 
         addSubStepButton.setOnClickListener { addSubStepRow(subStepsContainer, null) }
         removeStepButton.setOnClickListener { stepsContainer.removeView(row) }
@@ -316,7 +411,7 @@ class EditRecipeFragment : BaseFragment() {
 
     private fun exportRecipe() {
         val payload = buildRecipePayload() ?: return
-        val fileName = payload.fileName
+        val fileName = payload.fileName.removeSuffix(".json") + ".zip"
         exportRecipeLauncher.launch(fileName)
     }
 
@@ -324,8 +419,8 @@ class EditRecipeFragment : BaseFragment() {
         val payload = buildRecipePayload() ?: return
         try {
             requireContext().contentResolver.openOutputStream(uri)?.use { output ->
-                val jsonText = RecipeJsonFormat(recipes = listOf(payload.recipe)).toJsonObject().toString(2)
-                output.write(jsonText.toByteArray(Charsets.UTF_8))
+                val packageService = RecipePackageService(requireContext())
+                packageService.exportRecipePackage(payload.recipe, output)
             }
             Toast.makeText(requireContext(), R.string.recipes_edit_export_success, Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
@@ -366,6 +461,17 @@ class EditRecipeFragment : BaseFragment() {
             fileManager.upsertRecipeIndexEntry(payload.fileName, payload.recipe.name)
             Toast.makeText(requireContext(), R.string.recipes_edit_saved, Toast.LENGTH_SHORT).show()
             if (shouldNavigateBack) {
+                val addToMealDate = arguments?.getString(ARG_ADD_TO_MEAL_DATE)
+                val addToMealType = arguments?.getString(ARG_ADD_TO_MEAL_TYPE)
+                if (!addToMealDate.isNullOrBlank() && !addToMealType.isNullOrBlank()) {
+                    val result = Bundle().apply {
+                        putString(RESULT_RECIPE_NAME, payload.recipe.name)
+                        putString(RESULT_RECIPE_FILE_NAME, payload.fileName)
+                        putString(RESULT_ADD_TO_MEAL_DATE, addToMealDate)
+                        putString(RESULT_ADD_TO_MEAL_TYPE, addToMealType)
+                    }
+                    parentFragmentManager.setFragmentResult(RESULT_KEY_ADD_RECIPE_TO_MEAL, result)
+                }
                 findNavController().popBackStack()
             }
         } catch (_: IOException) {
@@ -460,7 +566,9 @@ class EditRecipeFragment : BaseFragment() {
             totalTime = totalTime,
             types = types,
             tags = tags?.takeIf { it.isNotEmpty() },
-            imageUrl = null,
+            imageUrl = recipePhotoDraft.primaryRelativePath(),
+            imageFiles = recipePhotoDraft.imageFiles.takeIf { it.isNotEmpty() },
+            primaryImageFile = recipePhotoDraft.primaryImageFile,
             ingredients = ingredients,
             steps = steps,
             metadata = metadata
@@ -542,6 +650,7 @@ class EditRecipeFragment : BaseFragment() {
             } catch (_: IllegalArgumentException) {
                 null
             }
+            val stepDraft = row.getTag(R.id.tag_step_photo_draft) as? RecipePhotoDraft ?: RecipePhotoDraft()
             steps.add(
                 RecipeStepJson(
                     stepOrder = steps.size + 1,
@@ -550,7 +659,9 @@ class EditRecipeFragment : BaseFragment() {
                     temperature = temperatureInput.text?.toString()?.trim()?.takeIf { it.isNotEmpty() },
                     notes = notesInput.text?.toString()?.trim()?.takeIf { it.isNotEmpty() },
                     ingredients = stepIngredients,
-                    subSteps = subSteps
+                    subSteps = subSteps,
+                    imageFiles = stepDraft.imageFiles.takeIf { it.isNotEmpty() },
+                    primaryImageFile = stepDraft.primaryImageFile
                 )
             )
         }
@@ -617,6 +728,149 @@ class EditRecipeFragment : BaseFragment() {
         }
     }
 
+    private fun showPhotoSourceDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.recipe_photo_source_title)
+            .setItems(
+                arrayOf(
+                    getString(R.string.recipe_photo_source_gallery),
+                    getString(R.string.recipe_photo_source_camera)
+                )
+            ) { _, which ->
+                if (which == 0) {
+                    pickImageLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                } else {
+                    requestCameraAndCapture()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun requestCameraAndCapture() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            launchCameraCapture()
+            return
+        }
+        pendingCameraAfterPermission = true
+        requestPermissionLauncher.launch(arrayOf(Manifest.permission.CAMERA))
+    }
+
+    private fun launchCameraCapture() {
+        val cacheDir = java.io.File(requireContext().cacheDir, "camera").apply { mkdirs() }
+        val photoFile = java.io.File(cacheDir, "capture_${System.currentTimeMillis()}.jpg")
+        cameraOutputUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            photoFile
+        )
+        takePictureLauncher.launch(cameraOutputUri)
+    }
+
+    private fun openCropEditor(sourceUri: Uri) {
+        val intent = Intent(requireContext(), RecipeImageCropEditorActivity::class.java).apply {
+            putExtra(RecipeImageCropEditorActivity.EXTRA_SOURCE_URI, sourceUri.toString())
+        }
+        cropEditorLauncher.launch(intent)
+    }
+
+    private fun handleCroppedImage(croppedUri: Uri) {
+        val bitmap = requireContext().contentResolver.openInputStream(croppedUri)?.use { input ->
+            BitmapFactory.decodeStream(input)
+        }
+        if (bitmap == null) {
+            Toast.makeText(requireContext(), R.string.recipe_photo_save_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val recipeId = editingRecipeId ?: "r-${UUID.randomUUID()}"
+        if (editingRecipeId == null) {
+            editingRecipeId = recipeId
+        }
+        val recipeName = nameInput.text?.toString()?.trim().orEmpty().ifBlank { "recette" }
+        val fileName = imageStorageManager.nextImageFileName(recipeId, recipeName)
+        try {
+            imageStorageManager.saveBitmap(fileName, bitmap)
+        } catch (_: Exception) {
+            Toast.makeText(requireContext(), R.string.recipe_photo_save_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val target = pendingPhotoTarget ?: PhotoAddTarget.RecipeLevel
+        val draft = when (target) {
+            PhotoAddTarget.RecipeLevel -> recipePhotoDraft
+            is PhotoAddTarget.StepLevel -> getStepPhotoDraft(target.stepRow)
+        }
+        val hadPhotos = draft.imageFiles.isNotEmpty()
+        draft.addImage(fileName, setAsPrimary = !hadPhotos)
+        if (hadPhotos && target is PhotoAddTarget.RecipeLevel) {
+            offerSetAsPrimary(draft, fileName)
+        }
+        when (target) {
+            PhotoAddTarget.RecipeLevel -> refreshRecipePhotosUi()
+            is PhotoAddTarget.StepLevel -> refreshStepPhotosUi(target.stepRow, draft)
+        }
+        pendingPhotoTarget = null
+    }
+
+    private fun offerSetAsPrimary(draft: RecipePhotoDraft, newFileName: String) {
+        val currentPrimary = draft.primaryImageFile ?: return
+        if (currentPrimary == newFileName) {
+            return
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.recipe_photo_primary_prompt_title)
+            .setMessage(getString(R.string.recipe_photo_primary_prompt_message, currentPrimary))
+            .setPositiveButton(R.string.recipe_photo_primary_prompt_yes) { _, _ ->
+                draft.setPrimary(newFileName)
+                refreshRecipePhotosUi()
+            }
+            .setNegativeButton(R.string.recipe_photo_primary_prompt_no, null)
+            .show()
+    }
+
+    private fun refreshRecipePhotosUi() {
+        RecipePhotoThumbnailBinder.bind(
+            fragment = this,
+            container = recipePhotosThumbnails,
+            draft = recipePhotoDraft,
+            imageStorage = imageStorageManager,
+            onPrimaryChanged = { refreshRecipePhotosUi() },
+            onPhotosChanged = { refreshRecipePhotosUi() }
+        )
+        RecipePhotoThumbnailBinder.loadPrimaryPreview(
+            fragment = this,
+            preview = recipePrimaryPhotoPreview,
+            draft = recipePhotoDraft,
+            imageStorage = imageStorageManager
+        )
+    }
+
+    private fun refreshStepPhotosUi(stepRow: View, draft: RecipePhotoDraft) {
+        val container = stepRow.findViewById<LinearLayout>(R.id.step_photos_thumbnails)
+        RecipePhotoThumbnailBinder.bind(
+            fragment = this,
+            container = container,
+            draft = draft,
+            imageStorage = imageStorageManager,
+            onPrimaryChanged = { refreshStepPhotosUi(stepRow, draft) },
+            onPhotosChanged = { refreshStepPhotosUi(stepRow, draft) }
+        )
+    }
+
+    private fun getStepPhotoDraft(stepRow: View): RecipePhotoDraft {
+        val existing = stepRow.getTag(R.id.tag_step_photo_draft) as? RecipePhotoDraft
+        if (existing != null) {
+            return existing
+        }
+        val created = RecipePhotoDraft()
+        stepRow.setTag(R.id.tag_step_photo_draft, created)
+        return created
+    }
+
     private fun sanitizeFileName(name: String): String {
         val normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
         val withoutAccents = normalized.replace("\\p{Mn}+".toRegex(), "")
@@ -632,8 +886,20 @@ class EditRecipeFragment : BaseFragment() {
 
     companion object {
         const val ARG_RECIPE_FILE_NAME = "recipeFileName"
+        const val ARG_ADD_TO_MEAL_DATE = "add_to_meal_date"
+        const val ARG_ADD_TO_MEAL_TYPE = "add_to_meal_type"
+        const val RESULT_KEY_ADD_RECIPE_TO_MEAL = "add_recipe_to_meal"
+        const val RESULT_RECIPE_NAME = "recipe_name"
+        const val RESULT_RECIPE_FILE_NAME = "recipe_file_name"
+        const val RESULT_ADD_TO_MEAL_DATE = "add_to_meal_date"
+        const val RESULT_ADD_TO_MEAL_TYPE = "add_to_meal_type"
         private const val DEFAULT_CATEGORY = "Autres"
         private const val DEFAULT_UNIT = "piece"
+    }
+
+    private sealed class PhotoAddTarget {
+        data object RecipeLevel : PhotoAddTarget()
+        data class StepLevel(val stepRow: View) : PhotoAddTarget()
     }
 
     private data class RecipePayload(

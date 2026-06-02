@@ -12,6 +12,7 @@ import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.AppSettingsManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlin.math.roundToInt
 
 /**
  * Helper class to apply accessibility settings to views throughout the app.
@@ -36,11 +37,12 @@ object AccessibilityHelper {
         applyToView(rootView, textSize, uiSize, contrast, falc)
     }
 
-    /** Clears "applied" tags so settings are re-applied with current values. Keeps original_text_size. */
+    /** Clears "applied" tags so settings are re-applied with current values. Keeps original_* tags. */
     private fun clearAppliedTags(view: View) {
         view.setTag(R.id.accessibility_text_size_applied, null)
         view.setTag(R.id.accessibility_ui_size_applied, null)
         view.setTag(R.id.accessibility_contrast_applied, null)
+        view.setTag(R.id.accessibility_margin_applied, null)
         if (view is ViewGroup) {
             view.children.forEach { clearAppliedTags(it) }
         }
@@ -73,20 +75,12 @@ object AccessibilityHelper {
                     applyTextSize(button, textSize)
                     button.setTag(R.id.accessibility_text_size_applied, true)
                 }
-                if (view.getTag(R.id.accessibility_ui_size_applied) == null) {
-                    applyUiSize(view, uiSize)
-                    view.setTag(R.id.accessibility_ui_size_applied, true)
-                }
                 if (contrast && view.getTag(R.id.accessibility_contrast_applied) == null) {
                     applyContrastToButton(view)
                     view.setTag(R.id.accessibility_contrast_applied, true)
                 }
             }
             is FloatingActionButton -> {
-                if (view.getTag(R.id.accessibility_ui_size_applied) == null) {
-                    applyUiSize(view, uiSize)
-                    view.setTag(R.id.accessibility_ui_size_applied, true)
-                }
                 if (contrast && view.getTag(R.id.accessibility_contrast_applied) == null) {
                     applyContrastToFAB(view)
                     view.setTag(R.id.accessibility_contrast_applied, true)
@@ -94,7 +88,7 @@ object AccessibilityHelper {
             }
             is ImageView -> {
                 if (view.getTag(R.id.accessibility_ui_size_applied) == null) {
-                    applyUiSize(view, uiSize)
+                    applyIconSize(view, uiSize)
                     view.setTag(R.id.accessibility_ui_size_applied, true)
                 }
             }
@@ -103,19 +97,37 @@ object AccessibilityHelper {
                     applyTextSize(view, textSize)
                     view.setTag(R.id.accessibility_text_size_applied, true)
                 }
-                if (view.getTag(R.id.accessibility_ui_size_applied) == null) {
-                    applyUiSize(view, uiSize)
-                    view.setTag(R.id.accessibility_ui_size_applied, true)
+                if (contrast && view.getTag(R.id.accessibility_contrast_applied) == null) {
+                    applyContrastToTextView(view)
+                    view.setTag(R.id.accessibility_contrast_applied, true)
                 }
             }
         }
         
+        // * Apply margin scale to any view with MarginLayoutParams (spacing between blocks/buttons)
+        if (view.layoutParams is ViewGroup.MarginLayoutParams && view.getTag(R.id.accessibility_margin_applied) == null) {
+            applyMarginScale(view, uiSize)
+            view.setTag(R.id.accessibility_margin_applied, true)
+        }
+
         // Apply to children
         if (view is ViewGroup) {
             view.children.forEach { child ->
                 applyToView(child, textSize, uiSize, contrast, falc)
             }
         }
+    }
+
+    /**
+     * UI size multiplier; 3 = 1.0f, 1 = 0.7f, 5 = 1.5f.
+     */
+    private fun uiSizeMultiplier(uiSize: Int): Float = when (uiSize) {
+        1 -> 0.7f
+        2 -> 0.85f
+        3 -> 1.0f
+        4 -> 1.25f
+        5 -> 1.5f
+        else -> 1.0f
     }
     
     /**
@@ -148,23 +160,67 @@ object AccessibilityHelper {
     }
     
     /**
-     * Applies UI size multiplier to icons and buttons.
-     * uiSize: 1-5, where 3 is default (1.0x), 1 is 0.7x, 5 is 1.5x
-     * Uses center pivot so scaling does not break icon/text centering.
+     * Applies UI size to margins (spacing between blocks and buttons).
+     * Stores original margins once, then sets margins to original * multiplier so content is not clipped.
      */
-    private fun applyUiSize(view: View, uiSize: Int) {
-        val multiplier = when (uiSize) {
-            1 -> 0.7f
-            2 -> 0.85f
-            3 -> 1.0f
-            4 -> 1.25f
-            5 -> 1.5f
-            else -> 1.0f
+    private fun applyMarginScale(view: View, uiSize: Int) {
+        val params = view.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        val multiplier = uiSizeMultiplier(uiSize)
+        @Suppress("UNCHECKED_CAST")
+        val stored = view.getTag(R.id.accessibility_original_margins) as? IntArray
+        val left: Int
+        val top: Int
+        val right: Int
+        val bottom: Int
+        if (stored != null && stored.size == 4) {
+            left = stored[0]
+            top = stored[1]
+            right = stored[2]
+            bottom = stored[3]
+        } else {
+            left = params.leftMargin
+            top = params.topMargin
+            right = params.rightMargin
+            bottom = params.bottomMargin
+            view.setTag(R.id.accessibility_original_margins, intArrayOf(left, top, right, bottom))
         }
-        view.pivotX = (view.width / 2).toFloat().takeIf { view.width > 0 } ?: view.pivotX
-        view.pivotY = (view.height / 2).toFloat().takeIf { view.height > 0 } ?: view.pivotY
-        view.scaleX = multiplier
-        view.scaleY = multiplier
+        params.leftMargin = (left * multiplier).roundToInt()
+        params.topMargin = (top * multiplier).roundToInt()
+        params.rightMargin = (right * multiplier).roundToInt()
+        params.bottomMargin = (bottom * multiplier).roundToInt()
+        view.requestLayout()
+    }
+
+    /**
+     * Applies UI size to ImageView icons by setting layout width/height to original size * multiplier.
+     * Does not scale the view (avoids clipping); the layout gets more space for the icon.
+     * Skips views with MATCH_PARENT so full-width/height images are not changed.
+     */
+    private fun applyIconSize(view: ImageView, uiSize: Int) {
+        val params = view.layoutParams ?: return
+        if (params.width == ViewGroup.LayoutParams.MATCH_PARENT || params.height == ViewGroup.LayoutParams.MATCH_PARENT) return
+        val multiplier = uiSizeMultiplier(uiSize)
+        var origW = view.getTag(R.id.accessibility_original_icon_width) as? Int
+        var origH = view.getTag(R.id.accessibility_original_icon_height) as? Int
+        if (origW == null || origH == null) {
+            origW = when {
+                params.width > 0 -> params.width
+                view.drawable != null -> view.drawable!!.intrinsicWidth
+                view.width > 0 -> view.width
+                else -> 48
+            }
+            origH = when {
+                params.height > 0 -> params.height
+                view.drawable != null -> view.drawable!!.intrinsicHeight
+                view.height > 0 -> view.height
+                else -> 48
+            }
+            view.setTag(R.id.accessibility_original_icon_width, origW)
+            view.setTag(R.id.accessibility_original_icon_height, origH)
+        }
+        params.width = (origW * multiplier).roundToInt()
+        params.height = (origH * multiplier).roundToInt()
+        view.requestLayout()
     }
     
     /**

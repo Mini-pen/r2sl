@@ -24,6 +24,12 @@
         tools:layout="@layout/fragment_edit_recipe" />
 
     <fragment
+        android:id="@+id/new_recipe_wizard"
+        android:name="com.frombeyond.r2sl.ui.recipes.NewRecipeWizardFragment"
+        android:label="@string/wizard_title"
+        tools:layout="@layout/fragment_new_recipe_wizard" />
+
+    <fragment
         android:id="@+id/recipe_viewer"
         android:name="com.frombeyond.r2sl.ui.recipes.RecipeViewerFragment"
         android:label="@string/recipe_viewer_title"

@@ -1,4 +1,4 @@
-n package com.therapia_solutions.therapia.utils
+package com.therapia_solutions.therapia.utils
 
 import org.junit.Test
 import org.junit.Assert.*

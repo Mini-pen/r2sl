@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -14,8 +15,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.NestedScrollView
 import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.export.RecipeJson
+import com.frombeyond.r2sl.data.local.RecipeImageStorageManager
 import com.frombeyond.r2sl.data.export.RecipeJsonPdfGenerator
 import com.frombeyond.r2sl.data.export.RecipeStepJson
 import com.frombeyond.r2sl.data.export.StepIngredientJson
@@ -38,6 +41,7 @@ class RecipeViewerFragment : BaseFragment() {
     private lateinit var metadataContent: LinearLayout
     private lateinit var deleteButton: MaterialButton
     private lateinit var fileManager: RecipesLocalFileManager
+    private lateinit var imageStorageManager: RecipeImageStorageManager
 
     private val sections = mutableListOf<Section>()
     private var currentIndex = 0
@@ -68,6 +72,7 @@ class RecipeViewerFragment : BaseFragment() {
         metadataContent = root.findViewById(R.id.metadata_content)
         deleteButton = root.findViewById(R.id.button_delete_recipe)
         fileManager = RecipesLocalFileManager(requireContext())
+        imageStorageManager = RecipeImageStorageManager(requireContext())
 
         backButton.setOnClickListener { findNavController().popBackStack() }
         prevButton.setOnClickListener { navigateToSection(currentIndex - 1) }
@@ -117,6 +122,7 @@ class RecipeViewerFragment : BaseFragment() {
         addSection(
             title = getString(R.string.recipe_viewer_section_presentation),
             contentBuilder = { container ->
+                addRecipePrimaryPhoto(container, recipe)
                 addKeyValue(container, getString(R.string.recipe_viewer_label_name), recipe.name)
                 recipe.description?.let {
                     addKeyValue(container, getString(R.string.recipe_viewer_label_description), it)
@@ -177,6 +183,7 @@ class RecipeViewerFragment : BaseFragment() {
                 step.notes?.let {
                     addKeyValue(container, getString(R.string.recipe_viewer_label_step_notes), it)
                 }
+                addStepPhotos(container, step)
                 addStepIngredients(container, step.ingredients)
                 addSubSteps(container, step)
             }
@@ -184,6 +191,54 @@ class RecipeViewerFragment : BaseFragment() {
 
         currentIndex = 0
         updateNavigationState()
+    }
+
+    private fun addRecipePrimaryPhoto(container: LinearLayout, recipe: RecipeJson) {
+        val fileName = recipe.primaryImageFile
+            ?: RecipeImageStorageManager.fileNameFromRelativePath(recipe.imageUrl)
+            ?: return
+        val file = imageStorageManager.getImageFile(fileName)
+        if (!file.exists()) return
+        val imageView = ImageView(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.recipe_photo_viewer_height)
+            ).apply {
+                bottomMargin = resources.getDimensionPixelSize(R.dimen.text_spacing_small)
+            }
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            contentDescription = getString(R.string.recipe_photo_primary_preview_desc)
+        }
+        Glide.with(this).load(file).centerCrop().into(imageView)
+        container.addView(imageView, 0)
+    }
+
+    private fun addStepPhotos(container: LinearLayout, step: RecipeStepJson) {
+        val files = step.imageFiles.orEmpty()
+        if (files.isEmpty()) return
+        val row = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.recipe_photo_step_thumb_height)
+            )
+        }
+        files.forEach { fileName ->
+            val file = imageStorageManager.getImageFile(fileName)
+            if (!file.exists()) return@forEach
+            val imageView = ImageView(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    resources.getDimensionPixelSize(R.dimen.recipe_photo_step_thumb_width),
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                ).apply { marginEnd = resources.getDimensionPixelSize(R.dimen.text_spacing_small) }
+                scaleType = ImageView.ScaleType.CENTER_CROP
+            }
+            Glide.with(this).load(file).centerCrop().into(imageView)
+            row.addView(imageView)
+        }
+        if (row.childCount > 0) {
+            container.addView(row)
+        }
     }
 
     private fun addStepIngredients(container: LinearLayout, ingredients: List<StepIngredientJson>?) {

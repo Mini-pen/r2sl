@@ -4,4 +4,9 @@
     <item name="accessibility_ui_size_applied" type="id" />
     <item name="accessibility_contrast_applied" type="id" />
     <item name="accessibility_original_text_size" type="id" />
+    <item name="accessibility_original_margins" type="id" />
+    <item name="accessibility_original_icon_width" type="id" />
+    <item name="accessibility_original_icon_height" type="id" />
+    <item name="accessibility_margin_applied" type="id" />
+    <item name="tag_step_photo_draft" type="id" />
 </resources>

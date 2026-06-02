@@ -4,65 +4,80 @@ Liste des tâches à réaliser. Cocher au fur et à mesure.
 
 ---
 
-## 1. Filtres dans le sélecteur de menu des jours
+## Prochaine vague (juin 2025)
+
+### 1. Assistant « Nouvelle recette »
+- [x] Assistant pas à pas (nom + ingrédients)
+- [x] Sauvegarde puis ouverture recette OU ajout au repas selon contexte
+- [x] `NewRecipeWizardFragment` + navigation
+
+### 2. Bouton « Nouvelle recette »
+- [x] Choix assistant / édition complète via `RecipeCreationLauncher`
+
+### 3. Raccourci depuis le sélecteur de recettes (menu)
+- [x] `recipe_selector_new_recipe` → `RecipeCreationLauncher`
+
+### 4. Popup visualisation jour (menu)
+- [x] `dialog_day_meals.xml` + lignes par plat avec boutons compacts
+
+### 5. Export menu en PDF (grille)
+- [x] `WeeklyMenuPdfGenerator` + bouton export semaine
+
+### 6. Export liste de courses PDF
+- [x] Emojis, cases ☐/☑, sources repas en fin de ligne
+
+### 7. Recopie de menu
+- [x] `MenuStorageManager.copyDayToFollowingDays` + UI dans dialog jour
+
+### 8. Mise à jour d’une liste de courses
+- [x] Appui long + `ShoppingListGenerator`
+
+### 9. Rayons modifiables et choix forcé
+- [x] Liste éditable dans Paramètres (`RayonsManager` + UI)
+- [x] Choix parmi la liste (plus de saisie libre) : édition recette, ajout manuel liste
+- [x] Option « Autre » pour ajouter un rayon à la volée
+- [x] Suppression avec réaffectation dans les recettes
+- [x] Inclure `rayons_list.json` dans le backup ZIP global
+
+---
+
+## Historique (avant juin 2025)
+
+### 1. Filtres dans le sélecteur de menu des jours
 - [x] Ajouter des filtres dans le sélecteur de menu des jours pour faciliter le choix des recettes
 
----
-
-## 2. Bouton supprimer un ingrédient
+### 2. Bouton supprimer un ingrédient
 - [ ] Remplacer le bouton actuel "supprimer un ingrédient" (trop facile à cliquer par erreur) par un bouton rouge avec une icône de poubelle
 
----
-
-## 3. Nombre de portions
+### 3. Nombre de portions
 - [ ] Ajouter la notion de **nombre de portions** dans les recettes et dans le choix des menus
+- [x] Lors du clic sur le menu déjà sélectionné : portions +/− (dialogue repas)
 - [ ] Lors du choix d’un repas, par défaut noter "1 portion"
-- [ ] Lors du clic sur le menu déjà sélectionné : à côté des 4 icônes, afficher le nombre de portions sélectionné, avec un **+** au-dessus et un **-** en dessous
-- [ ] Lors de la génération de la liste des courses : prendre en compte le nombre de portions pour le calcul proportionnel
-- [ ] Garder des **chiffres entiers** sur la liste de courses (ex. recette pour 4 avec 1 œuf, pour 2 portions → afficher 1 œuf entier avec une icône "i" en rond orange ; cliquer dessus rappelle que seul 1/2 œuf est nécessaire)
-- [ ] Dans le rappel des recettes utilisées (clic sur un ingrédient de la liste) : afficher la **quantité avant la recette** (ex. 5 œufs répartis en 3 recettes → voir d’un coup d’œil la répartition)
+- [ ] Lors de la génération de la liste des courses : calcul proportionnel complet
+- [ ] Chiffres entiers + icône info pour fractions
+- [ ] Rappel des quantités par recette dans le détail ingrédient
 
----
+### 4. Liste préétablie de rayons (ancienne spec)
+- [x] Voir section 9 ci-dessus (implémenté juin 2025)
 
-## 4. Liste préétablie de rayons
-- [ ] Liste préétablie de rayons à choisir pour faciliter l’ajout d’ingrédients et garder la liste de courses cohérente
-- [ ] Bloc dans l’onglet **Paramètres** pour éditer cette liste de rayons
-- [ ] Lors du choix : option **"Autre"** ouvrant une boîte de dialogue pour ajouter un rayon à la volée (visible aussi dans la liste des paramètres)
-- [ ] Lors de la suppression d’un rayon : demander à quel nouveau rayon réaffecter les ingrédients concernés et appliquer la modification dans les recettes existantes
-- [ ] Pré-remplir la liste avec les rayons déjà présents et appliquer le bon rayon à **tous** les ingrédients des listes par défaut existantes
-
----
-
-## 5. Bouton "+" onglet recettes
+### 5. Bouton "+" onglet recettes
 - [ ] Bouton "+" dans l’onglet recettes coupé : revoir la taille et les marges
 
----
-
-## 6. Centrage des icônes dans les boutons
+### 6. Centrage des icônes dans les boutons
 - [ ] Icônes mal calées dans les boutons : qu’elles soient toujours centrées
 
----
-
-## 7. Taille des icônes portrait / paysage
+### 7. Taille des icônes portrait / paysage
 - [ ] Les icônes changent de taille en portrait et paysage et débordent en repassant en portrait
 
----
-
-## 8. Tablette et icônes
-- [ ] Corriger le plantage sur tablette (pas de souci sur téléphone ; possible problème de version Android)
+### 8. Tablette et icônes
+- [ ] Corriger le plantage sur tablette
 - [ ] Mettre la même icône partout (harmonisation)
 
----
-
-## 9. Emojis sur les ingrédients
-- [ ] Ajouter des emojis sur les ingrédients
-- [ ] Dictionnaire interne associant de nombreux ingrédients à des emojis
-- [ ] Dictionnaire chargeable et exportable en JSON depuis les paramètres
-- [ ] Lors de la saisie d’un nouvel ingrédient dans une recette : pouvoir choisir un emoji
-- [ ] Par défaut : si le dictionnaire associe des mots de l’ingrédient à des emojis, les proposer en haut de la liste ; le reste = tous les emojis du dictionnaire
-- [ ] En parcourant les recettes existantes, préparer une première version du dictionnaire : **default_emoji_dict.json**
-- [ ] Bouton **"Charger les emojis par défaut"** dans les paramètres
+### 9. Emojis sur les ingrédients
+- [x] Dictionnaire + choix emoji à l’édition (partiellement fait)
+- [ ] Export/import JSON dictionnaire depuis paramètres (si incomplet)
+- [ ] default_emoji_dict.json + bouton charger par défaut (vérifier état)
 
 ---
 
-*Dernière mise à jour : 2025-01-24*
+*Dernière mise à jour : 2025-06-02*

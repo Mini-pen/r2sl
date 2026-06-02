@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="6dp"
+    android:paddingHorizontal="4dp">
+
+    <TextView
+        android:id="@+id/day_meal_dish_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/day_meal_portions_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:minWidth="20dp"
+        android:gravity="center" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/day_meal_portions_minus"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:text="−"
+        android:textSize="16sp"
+        android:padding="0dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="@color/primary_blue"
+        app:cornerRadius="18dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/day_meal_portions_plus"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:text="+"
+        android:textSize="16sp"
+        android:padding="0dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="@color/primary_blue"
+        app:cornerRadius="18dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/day_meal_delete"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="4dp"
+        android:contentDescription="@string/meal_action_delete"
+        android:padding="0dp"
+        app:icon="@drawable/ic_delete_24"
+        app:iconSize="18dp"
+        app:iconPadding="0dp"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/error_color"
+        app:cornerRadius="18dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/day_meal_change"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="2dp"
+        android:contentDescription="@string/meal_action_change"
+        android:padding="0dp"
+        app:icon="@drawable/ic_edit_24"
+        app:iconSize="18dp"
+        app:iconPadding="0dp"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/primary_blue"
+        app:cornerRadius="18dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/day_meal_view_recipe"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="2dp"
+        android:contentDescription="@string/meal_action_view_recipe"
+        android:padding="0dp"
+        app:icon="@drawable/ic_recipe_24"
+        app:iconSize="18dp"
+        app:iconPadding="0dp"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/secondary_green"
+        app:cornerRadius="18dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/day_meal_add_another"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="2dp"
+        android:contentDescription="@string/meal_action_add_another"
+        android:padding="0dp"
+        app:icon="@drawable/ic_add_24"
+        app:iconSize="18dp"
+        app:iconPadding="0dp"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/success_color"
+        app:cornerRadius="18dp" />
+</LinearLayout>

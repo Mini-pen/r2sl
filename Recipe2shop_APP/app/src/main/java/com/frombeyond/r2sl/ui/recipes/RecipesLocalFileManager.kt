@@ -2,6 +2,7 @@ package com.frombeyond.r2sl.ui.recipes
 
 import android.content.Context
 import com.frombeyond.r2sl.data.export.RecipeJsonFormat
+import com.frombeyond.r2sl.data.export.RecipeMetadataJson
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -99,7 +100,15 @@ class RecipesLocalFileManager(private val context: Context) {
             recipesDir.mkdirs()
         }
         val targetFile = File(recipesDir, fileName)
-        val jsonText = format.toJsonObject().toString(2)
+        val now = System.currentTimeMillis()
+        val normalized = format.copy(
+            recipes = format.recipes.map { recipe ->
+                val metadata = recipe.metadata?.copy(updatedAt = now)
+                    ?: RecipeMetadataJson.createDefault().copy(updatedAt = now)
+                recipe.copy(metadata = metadata)
+            }
+        )
+        val jsonText = normalized.toJsonObject().toString(2)
         targetFile.writeText(jsonText, Charsets.UTF_8)
     }
 

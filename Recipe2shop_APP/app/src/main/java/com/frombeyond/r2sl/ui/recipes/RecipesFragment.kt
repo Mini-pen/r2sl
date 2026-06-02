@@ -16,6 +16,7 @@ import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.export.RecipeJsonFormat
 import com.frombeyond.r2sl.data.export.RecipeJson
 import com.frombeyond.r2sl.data.export.RecipeMetadataJson
+import com.frombeyond.r2sl.utils.AccessibilityHelper
 import com.frombeyond.r2sl.utils.ErrorLogger
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -83,7 +84,11 @@ class RecipesFragment : BaseFragment() {
 
     private fun setupListeners() {
         newRecipeButton.setOnClickListener {
-            findNavController().navigate(R.id.edit_recipe)
+            RecipeCreationLauncher.show(
+                fragment = this,
+                navController = findNavController(),
+                openRecipeAfterSave = true
+            )
         }
 
         filterButton.setOnClickListener {
@@ -264,6 +269,7 @@ class RecipesFragment : BaseFragment() {
             dialog.dismiss()
         }
 
+        AccessibilityHelper.applyAccessibilitySettings(requireContext(), dialogView)
         dialog.show()
     }
 
@@ -439,6 +445,7 @@ class RecipesFragment : BaseFragment() {
             }
             findNavController().navigate(R.id.edit_recipe, bundle)
         }
+        AccessibilityHelper.applyAccessibilitySettings(requireContext(), row)
         return row
     }
     

@@ -30,6 +30,7 @@ class ShoppingListStorageManager(private val context: Context) {
     fun saveLists(lists: List<ShoppingListEntry>) {
         val file = getFile()
         val json = JSONObject().apply {
+            put(KEY_UPDATED_AT, System.currentTimeMillis())
             put(KEY_LISTS, JSONArray().apply {
                 lists.forEach { put(it.toJson()) }
             })
@@ -191,5 +192,6 @@ class ShoppingListStorageManager(private val context: Context) {
     companion object {
         private const val FILE_NAME = "shopping_lists.json"
         private const val KEY_LISTS = "lists"
+        private const val KEY_UPDATED_AT = "updatedAt"
     }
 }

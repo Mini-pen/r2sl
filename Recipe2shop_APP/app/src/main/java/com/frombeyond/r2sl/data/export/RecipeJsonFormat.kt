@@ -96,6 +96,8 @@ data class RecipeJson(
     val types: List<String>?, // Types de recette: "entrée", "apéritif", "plat principal", "dessert", "encas"
     val tags: List<String>?, // Tags libres pour catégorisation
     val imageUrl: String?,
+    val imageFiles: List<String>? = null,
+    val primaryImageFile: String? = null,
     val ingredients: List<IngredientJson>,
     val steps: List<RecipeStepJson>,
     val metadata: RecipeMetadataJson?
@@ -124,6 +126,12 @@ data class RecipeJson(
             }
             
             imageUrl?.let { put("imageUrl", it) }
+            imageFiles?.takeIf { it.isNotEmpty() }?.let { files ->
+                val imagesArray = JSONArray()
+                files.forEach { imagesArray.put(it) }
+                put("imageFiles", imagesArray)
+            }
+            primaryImageFile?.let { put("primaryImageFile", it) }
             
             val ingredientsArray = JSONArray()
             ingredients.forEach { ingredient ->
@@ -167,6 +175,11 @@ data class RecipeJson(
                 types = types,
                 tags = tags,
                 imageUrl = json.optString("imageUrl").takeIf { it.isNotEmpty() },
+                imageFiles = if (json.has("imageFiles")) {
+                    val imagesArray = json.getJSONArray("imageFiles")
+                    (0 until imagesArray.length()).map { imagesArray.getString(it) }
+                } else null,
+                primaryImageFile = json.optString("primaryImageFile").takeIf { it.isNotEmpty() },
                 ingredients = parseIngredients(json.getJSONArray("ingredients")),
                 steps = parseSteps(json.getJSONArray("steps")),
                 metadata = if (json.has("metadata")) {
@@ -307,7 +320,9 @@ data class RecipeStepJson(
     val temperature: String?, // Temperature (e.g., "180°C", "medium heat")
     val notes: String?, // Optional notes
     val ingredients: List<StepIngredientJson>?, // Ingredients used in this step with quantities
-    val subSteps: List<SubStepJson> // List of sub-steps, each with instruction and instructionFalc
+    val subSteps: List<SubStepJson>, // List of sub-steps, each with instruction and instructionFalc
+    val imageFiles: List<String>? = null,
+    val primaryImageFile: String? = null
 ) {
     fun toJsonObject(): JSONObject {
         return JSONObject().apply {
@@ -330,6 +345,13 @@ data class RecipeStepJson(
                 subStepsArray.put(subStep.toJsonObject())
             }
             put("subSteps", subStepsArray)
+
+            imageFiles?.takeIf { it.isNotEmpty() }?.let { files ->
+                val imagesArray = JSONArray()
+                files.forEach { imagesArray.put(it) }
+                put("imageFiles", imagesArray)
+            }
+            primaryImageFile?.let { put("primaryImageFile", it) }
         }
     }
     
@@ -356,7 +378,12 @@ data class RecipeStepJson(
                 temperature = json.optString("temperature").takeIf { it.isNotEmpty() },
                 notes = json.optString("notes").takeIf { it.isNotEmpty() },
                 ingredients = stepIngredients,
-                subSteps = subSteps
+                subSteps = subSteps,
+                imageFiles = if (json.has("imageFiles")) {
+                    val imagesArray = json.getJSONArray("imageFiles")
+                    (0 until imagesArray.length()).map { imagesArray.getString(it) }
+                } else null,
+                primaryImageFile = json.optString("primaryImageFile").takeIf { it.isNotEmpty() }
             )
         }
     }

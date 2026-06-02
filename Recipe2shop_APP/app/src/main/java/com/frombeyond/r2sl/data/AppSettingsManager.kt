@@ -3,6 +3,7 @@ package com.frombeyond.r2sl.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import org.json.JSONObject
 
 /**
  * Gestionnaire des paramètres de l'application
@@ -13,6 +14,7 @@ class AppSettingsManager(private val context: Context) {
     companion object {
         private const val PREFS_NAME = "r2sl_settings"
         private const val KEY_DEV_FEATURES_ENABLED = "dev_features_enabled"
+        private const val KEY_SETTINGS_UPDATED_AT = "settings_updated_at"
         private const val TAG = "AppSettingsManager"
         const val KEY_ACCESS_TEXT_SIZE = "access_text_size"
         const val KEY_ACCESS_UI_SIZE = "access_ui_size"
@@ -32,6 +34,7 @@ class AppSettingsManager(private val context: Context) {
         try {
             sharedPreferences.edit()
                 .putBoolean(KEY_DEV_FEATURES_ENABLED, enabled)
+                .putLong(KEY_SETTINGS_UPDATED_AT, System.currentTimeMillis())
                 .apply()
             Log.d(TAG, "Fonctionnalités développeur ${if (enabled) "activées" else "désactivées"}")
         } catch (e: Exception) {
@@ -58,6 +61,7 @@ class AppSettingsManager(private val context: Context) {
         try {
             sharedPreferences.edit()
                 .putBoolean(key, value)
+                .putLong(KEY_SETTINGS_UPDATED_AT, System.currentTimeMillis())
                 .apply()
             Log.d(TAG, "Paramètre sauvegardé: $key = $value")
         } catch (e: Exception) {
@@ -84,6 +88,7 @@ class AppSettingsManager(private val context: Context) {
         try {
             sharedPreferences.edit()
                 .putString(key, value)
+                .putLong(KEY_SETTINGS_UPDATED_AT, System.currentTimeMillis())
                 .apply()
             Log.d(TAG, "Paramètre sauvegardé: $key = $value")
         } catch (e: Exception) {
@@ -110,6 +115,7 @@ class AppSettingsManager(private val context: Context) {
         try {
             sharedPreferences.edit()
                 .putInt(key, value)
+                .putLong(KEY_SETTINGS_UPDATED_AT, System.currentTimeMillis())
                 .apply()
             Log.d(TAG, "Paramètre sauvegardé: $key = $value")
         } catch (e: Exception) {
@@ -134,7 +140,10 @@ class AppSettingsManager(private val context: Context) {
      */
     fun clearAllSettings() {
         try {
-            sharedPreferences.edit().clear().apply()
+            sharedPreferences.edit()
+                .clear()
+                .putLong(KEY_SETTINGS_UPDATED_AT, System.currentTimeMillis())
+                .apply()
             Log.d(TAG, "Tous les paramètres ont été effacés")
         } catch (e: Exception) {
             Log.e(TAG, "Erreur lors de l'effacement des paramètres", e)
@@ -182,6 +191,52 @@ class AppSettingsManager(private val context: Context) {
             
         } catch (e: Exception) {
             Log.e(TAG, "Erreur lors du chargement des paramètres depuis le fichier: ${file.absolutePath}", e)
+            false
+        }
+    }
+
+    fun getLastUpdatedAt(): Long {
+        return sharedPreferences.getLong(KEY_SETTINGS_UPDATED_AT, 0L)
+    }
+
+    fun exportSettingsAsJson(): JSONObject {
+        val all = sharedPreferences.all
+        val json = JSONObject()
+        all.forEach { (key, value) ->
+            when (value) {
+                is Boolean, is Int, is Long, is Float, is String -> json.put(key, value)
+                else -> json.put(key, value?.toString() ?: "")
+            }
+        }
+        if (!json.has(KEY_SETTINGS_UPDATED_AT)) {
+            json.put(KEY_SETTINGS_UPDATED_AT, getLastUpdatedAt())
+        }
+        return json
+    }
+
+    fun importSettingsFromJson(json: JSONObject): Boolean {
+        return try {
+            val editor = sharedPreferences.edit().clear()
+            val keys = json.keys()
+            while (keys.hasNext()) {
+                val key = keys.next()
+                val value = json.get(key)
+                when (value) {
+                    is Boolean -> editor.putBoolean(key, value)
+                    is Int -> editor.putInt(key, value)
+                    is Long -> editor.putLong(key, value)
+                    is Double -> editor.putFloat(key, value.toFloat())
+                    is String -> editor.putString(key, value)
+                    else -> editor.putString(key, value.toString())
+                }
+            }
+            if (!json.has(KEY_SETTINGS_UPDATED_AT)) {
+                editor.putLong(KEY_SETTINGS_UPDATED_AT, System.currentTimeMillis())
+            }
+            editor.apply()
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Erreur import des paramètres JSON", e)
             false
         }
     }

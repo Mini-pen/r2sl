@@ -3,6 +3,8 @@ package com.frombeyond.r2sl.ui.weeklymenu
 import android.app.DatePickerDialog
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.view.Gravity
+import android.view.WindowManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -19,8 +21,14 @@ import androidx.navigation.fragment.findNavController
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.local.DishStorageManager
 import com.frombeyond.r2sl.data.local.MenuStorageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
+import com.frombeyond.r2sl.data.export.WeeklyMenuPdfGenerator
+import com.frombeyond.r2sl.ui.recipes.EditRecipeFragment
+import com.frombeyond.r2sl.ui.recipes.RecipeCreationLauncher
 import com.frombeyond.r2sl.ui.recipes.RecipesLocalFileManager
 import com.frombeyond.r2sl.ui.recipes.RecipeViewerFragment
+import com.frombeyond.r2sl.utils.AccessibilityHelper
 import com.frombeyond.r2sl.utils.ErrorLogger
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -52,6 +60,14 @@ class WeeklyMenuFragment : BaseFragment() {
     private lateinit var dishStorage: DishStorageManager
     private lateinit var recipesFileManager: RecipesLocalFileManager
     private lateinit var menuStartDate: LocalDate
+    private lateinit var exportMenuPdfButton: MaterialButton
+
+    private val exportMenuPdfLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+            if (uri != null) {
+                exportMenuPdfToUri(uri)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +86,7 @@ class WeeklyMenuFragment : BaseFragment() {
         buttonCalendar = root.findViewById(R.id.button_weekly_menu_calendar)
         menuIcon = root.findViewById(R.id.iv_weekly_menu_icon)
         startDateDisplay = root.findViewById(R.id.weekly_menu_start_date_display)
+        exportMenuPdfButton = root.findViewById(R.id.button_export_weekly_menu_pdf)
 
         menuStorage = MenuStorageManager(requireContext())
         dishStorage = DishStorageManager(requireContext())
@@ -96,6 +113,31 @@ class WeeklyMenuFragment : BaseFragment() {
         }
         buttonCalendar.setOnClickListener {
             openDatePicker()
+        }
+
+        exportMenuPdfButton.setOnClickListener {
+            val fileName = "menu_${menuStartDate}.pdf"
+            exportMenuPdfLauncher.launch(fileName)
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            EditRecipeFragment.RESULT_KEY_ADD_RECIPE_TO_MEAL,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val recipeName = bundle.getString(EditRecipeFragment.RESULT_RECIPE_NAME)
+            val recipeFileName = bundle.getString(EditRecipeFragment.RESULT_RECIPE_FILE_NAME)
+            val dateStr = bundle.getString(EditRecipeFragment.RESULT_ADD_TO_MEAL_DATE)
+            val mealType = bundle.getString(EditRecipeFragment.RESULT_ADD_TO_MEAL_TYPE)
+            if (!recipeName.isNullOrBlank() && !recipeFileName.isNullOrBlank() && !dateStr.isNullOrBlank() && !mealType.isNullOrBlank()) {
+                try {
+                    val date = LocalDate.parse(dateStr)
+                    val dish = dishStorage.addDishIfMissing(recipeName, recipeFileName)
+                    menuStorage.addDish(date, mealType, dish.id)
+                    renderCurrentView()
+                } catch (e: Exception) {
+                    ErrorLogger.getInstance().logError("Erreur ajout recette au menu après création", e, "WeeklyMenuFragment")
+                }
+            }
         }
 
         loadMenuIcon()
@@ -162,12 +204,14 @@ class WeeklyMenuFragment : BaseFragment() {
             showMealChoiceDialog(date)
         }
 
-        lunchContainer.setOnClickListener {
-            showMealActionDialog(date, MenuStorageManager.MEAL_LUNCH)
+        title.setOnClickListener {
+            showDayDetailDialog(date)
         }
-
+        lunchContainer.setOnClickListener {
+            showDayDetailDialog(date)
+        }
         dinnerContainer.setOnClickListener {
-            showMealActionDialog(date, MenuStorageManager.MEAL_DINNER)
+            showDayDetailDialog(date)
         }
 
         return card
@@ -223,11 +267,6 @@ class WeeklyMenuFragment : BaseFragment() {
                     null
                 }
             }
-            if (entriesWithRecipe.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.menu_no_recipes, Toast.LENGTH_SHORT).show()
-                return
-            }
-
             val dialogView = layoutInflater.inflate(R.layout.dialog_recipe_selector, null)
             val searchInput = dialogView.findViewById<TextInputEditText>(R.id.recipe_search_input)
             val recipeList = dialogView.findViewById<ListView>(R.id.recipe_list)
@@ -299,6 +338,18 @@ class WeeklyMenuFragment : BaseFragment() {
                 .setNegativeButton(R.string.recipes_edit_duplicate_cancel, null)
                 .create()
 
+            val newRecipeBtn = dialogView.findViewById<MaterialButton>(R.id.recipe_selector_new_recipe)
+            newRecipeBtn.setOnClickListener {
+                dialog.dismiss()
+                RecipeCreationLauncher.show(
+                    fragment = this,
+                    navController = findNavController(),
+                    addToMealDate = date.toString(),
+                    addToMealType = mealType
+                )
+            }
+
+            AccessibilityHelper.applyAccessibilitySettings(requireContext(), dialogView)
             recipeList.setOnItemClickListener { _, _, position, _ ->
                 try {
                     val filtered = applyFilters()
@@ -316,6 +367,10 @@ class WeeklyMenuFragment : BaseFragment() {
             }
 
             dialog.show()
+            // * Re-apply accessibility after ListView has created its item views
+            dialogView.post {
+                AccessibilityHelper.applyAccessibilitySettings(requireContext(), dialogView)
+            }
         } catch (e: Exception) {
             ErrorLogger.getInstance().logError("Erreur lors de l'ouverture du dialog de sélection de recette", e, "WeeklyMenuFragment")
             Toast.makeText(requireContext(), "Erreur lors de l'ouverture de la liste des recettes", Toast.LENGTH_SHORT).show()
@@ -340,89 +395,98 @@ class WeeklyMenuFragment : BaseFragment() {
             .show()
     }
 
-    private fun showMealActionDialog(date: LocalDate, mealType: String, initialIndex: Int = 0) {
-        val assignments = menuStorage.getAssignments(date, mealType)
-        if (assignments.isEmpty()) {
-            // Pas de repas assigné, on peut juste ajouter
-            showMealChoiceDialog(date)
-            return
-        }
+    private fun showDayDetailDialog(date: LocalDate) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_day_meals, null)
+        val titleText = dialogView.findViewById<TextView>(R.id.dialog_day_title)
+        val lunchRows = dialogView.findViewById<LinearLayout>(R.id.dialog_day_lunch_rows)
+        val dinnerRows = dialogView.findViewById<LinearLayout>(R.id.dialog_day_dinner_rows)
+        val addLunchBtn = dialogView.findViewById<MaterialButton>(R.id.dialog_day_add_lunch)
+        val addDinnerBtn = dialogView.findViewById<MaterialButton>(R.id.dialog_day_add_dinner)
+        val copyMenuBtn = dialogView.findViewById<MaterialButton>(R.id.dialog_day_copy_menu)
 
-        val mealTypeLabel = if (mealType == MenuStorageManager.MEAL_LUNCH) {
-            getString(R.string.weekly_menu_lunch)
-        } else {
-            getString(R.string.weekly_menu_dinner)
-        }
-
-        val dialogView = layoutInflater.inflate(R.layout.dialog_meal_actions, null)
-        val titleText = dialogView.findViewById<TextView>(R.id.dialog_meal_title)
-        val prevButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_prev)
-        val nextButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_next)
-        val deleteButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_delete)
-        val changeButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_change)
-        val viewRecipeButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_view_recipe)
-        val addAnotherButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_add_another)
-        val portionsPlusButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_portions_plus)
-        val portionsMinusButton = dialogView.findViewById<MaterialButton>(R.id.button_meal_portions_minus)
-        val portionsText = dialogView.findViewById<TextView>(R.id.dialog_meal_portions)
+        titleText.text = formatDayTitle(date)
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .setNegativeButton(android.R.string.cancel, null)
             .create()
 
-        var currentAssignments = assignments.toMutableList()
-        var currentIndex = initialIndex.coerceIn(0, currentAssignments.size - 1)
+        fun refreshDialog() {
+            populateMealRows(lunchRows, date, MenuStorageManager.MEAL_LUNCH, dialog)
+            populateMealRows(dinnerRows, date, MenuStorageManager.MEAL_DINNER, dialog)
+            renderCurrentView()
+        }
 
-        fun updateDialogContent(index: Int) {
-            if (index < 0 || index >= currentAssignments.size) return
+        addLunchBtn.setOnClickListener {
+            dialog.dismiss()
+            showRecipesDialog(date, MenuStorageManager.MEAL_LUNCH)
+        }
+        addDinnerBtn.setOnClickListener {
+            dialog.dismiss()
+            showRecipesDialog(date, MenuStorageManager.MEAL_DINNER)
+        }
+        copyMenuBtn.setOnClickListener {
+            showCopyMenuDialog(date, dialog)
+        }
 
-            val assignment = currentAssignments[index]
-            val dish = dishStorage.getDishById(assignment.dishId)
-            if (dish == null) {
-                Toast.makeText(requireContext(), R.string.meal_dish_not_found, Toast.LENGTH_SHORT).show()
-                return
+        refreshDialog()
+
+        dialog.show()
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setGravity(Gravity.CENTER)
+    }
+
+    private fun populateMealRows(
+        container: LinearLayout,
+        date: LocalDate,
+        mealType: String,
+        parentDialog: androidx.appcompat.app.AlertDialog
+    ) {
+        container.removeAllViews()
+        val assignments = menuStorage.getAssignments(date, mealType)
+        if (assignments.isEmpty()) {
+            val empty = TextView(requireContext()).apply {
+                text = getString(R.string.weekly_menu_placeholder_meal)
+                setTextColor(requireContext().getColor(R.color.text_secondary))
             }
+            container.addView(empty)
+            return
+        }
+        assignments.forEach { assignment ->
+            val dish = dishStorage.getDishById(assignment.dishId) ?: return@forEach
+            val row = layoutInflater.inflate(R.layout.item_day_meal_dish_row, container, false)
+            row.findViewById<TextView>(R.id.day_meal_dish_name).text = dish.name
+            val portionsLabel = row.findViewById<TextView>(R.id.day_meal_portions_label)
+            portionsLabel.text = assignment.portions.toString()
 
-            titleText.text = "$mealTypeLabel - ${dish.name}"
-            portionsText.text = assignment.portions.toString()
-
-            portionsPlusButton.setOnClickListener {
-                val a = currentAssignments.getOrNull(currentIndex) ?: return@setOnClickListener
-                val newPortions = a.portions + 1
-                menuStorage.setPortions(date, mealType, a.dishId, newPortions)
-                currentAssignments[currentIndex] = a.copy(portions = newPortions)
-                portionsText.text = newPortions.toString()
+            row.findViewById<MaterialButton>(R.id.day_meal_portions_plus).setOnClickListener {
+                val newPortions = assignment.portions + 1
+                menuStorage.setPortions(date, mealType, assignment.dishId, newPortions)
+                parentDialog.dismiss()
+                showDayDetailDialog(date)
             }
-            portionsMinusButton.setOnClickListener {
-                val a = currentAssignments.getOrNull(currentIndex) ?: return@setOnClickListener
-                if (a.portions <= 1) return@setOnClickListener
-                val newPortions = a.portions - 1
-                menuStorage.setPortions(date, mealType, a.dishId, newPortions)
-                currentAssignments[currentIndex] = a.copy(portions = newPortions)
-                portionsText.text = newPortions.toString()
+            row.findViewById<MaterialButton>(R.id.day_meal_portions_minus).setOnClickListener {
+                if (assignment.portions <= 1) return@setOnClickListener
+                val newPortions = assignment.portions - 1
+                menuStorage.setPortions(date, mealType, assignment.dishId, newPortions)
+                parentDialog.dismiss()
+                showDayDetailDialog(date)
             }
-
-            val hasMultiple = currentAssignments.size > 1
-            prevButton.alpha = if (hasMultiple && index > 0) 1.0f else 0.2f
-            nextButton.alpha = if (hasMultiple && index < currentAssignments.size - 1) 1.0f else 0.2f
-            prevButton.isEnabled = hasMultiple && index > 0
-            nextButton.isEnabled = hasMultiple && index < currentAssignments.size - 1
-
-            deleteButton.setOnClickListener {
+            row.findViewById<MaterialButton>(R.id.day_meal_delete).setOnClickListener {
                 menuStorage.removeAssignment(date, mealType, assignment.dishId)
-                dialog.dismiss()
-                renderCurrentView()
+                parentDialog.dismiss()
+                showDayDetailDialog(date)
             }
-
-            changeButton.setOnClickListener {
-                dialog.dismiss()
+            row.findViewById<MaterialButton>(R.id.day_meal_change).setOnClickListener {
                 menuStorage.removeAssignment(date, mealType, assignment.dishId)
+                parentDialog.dismiss()
                 showRecipesDialog(date, mealType)
             }
-
-            viewRecipeButton.setOnClickListener {
-                dialog.dismiss()
+            row.findViewById<MaterialButton>(R.id.day_meal_view_recipe).setOnClickListener {
+                parentDialog.dismiss()
                 val recipeFileName = dish.recipeFileName
                 if (recipeFileName != null) {
                     val bundle = Bundle().apply {
@@ -433,31 +497,72 @@ class WeeklyMenuFragment : BaseFragment() {
                     Toast.makeText(requireContext(), R.string.meal_dish_no_recipe, Toast.LENGTH_SHORT).show()
                 }
             }
-
-            addAnotherButton.setOnClickListener {
-                dialog.dismiss()
+            row.findViewById<MaterialButton>(R.id.day_meal_add_another).setOnClickListener {
+                parentDialog.dismiss()
                 showRecipesDialog(date, mealType)
             }
+            container.addView(row)
         }
+    }
 
-        prevButton.setOnClickListener {
-            if (currentIndex > 0) {
-                currentIndex--
-                updateDialogContent(currentIndex)
+    private fun showCopyMenuDialog(sourceDate: LocalDate, parentDialog: androidx.appcompat.app.AlertDialog) {
+        val input = TextInputEditText(requireContext()).apply {
+            setText("7")
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            val margin = (16 * resources.displayMetrics.density).toInt()
+            setPadding(margin, margin, margin, margin)
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.menu_copy_day_title)
+            .setMessage(getString(R.string.menu_copy_day_message, formatDayTitle(sourceDate)))
+            .setView(input)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val dayCount = input.text?.toString()?.trim()?.toIntOrNull() ?: 7
+                when (val result = menuStorage.copyDayToFollowingDays(sourceDate, dayCount)) {
+                    is MenuStorageManager.MenuCopyResult.Success -> {
+                        parentDialog.dismiss()
+                        renderCurrentView()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.menu_copy_day_success, result.daysCopied),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is MenuStorageManager.MenuCopyResult.Overlap -> {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.menu_copy_day_overlap, formatDayTitle(result.date)),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    MenuStorageManager.MenuCopyResult.SourceDayEmpty -> {
+                        Toast.makeText(requireContext(), R.string.menu_copy_day_empty, Toast.LENGTH_SHORT).show()
+                    }
+                    MenuStorageManager.MenuCopyResult.InvalidDayCount -> {
+                        Toast.makeText(requireContext(), R.string.menu_copy_day_invalid, Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
-        }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
 
-        nextButton.setOnClickListener {
-            if (currentIndex < currentAssignments.size - 1) {
-                currentIndex++
-                updateDialogContent(currentIndex)
+    private fun exportMenuPdfToUri(uri: Uri) {
+        try {
+            val days = (0 until 7).map { menuStartDate.plusDays(it.toLong()) }
+            requireContext().contentResolver.openOutputStream(uri)?.use { output ->
+                WeeklyMenuPdfGenerator(requireContext()).generatePdf(
+                    days = days,
+                    menuStorage = menuStorage,
+                    dishStorage = dishStorage,
+                    outputStream = output
+                )
             }
+            Toast.makeText(requireContext(), R.string.weekly_menu_export_success, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            ErrorLogger.getInstance().logError("Erreur export PDF menu", e, "WeeklyMenuFragment")
+            Toast.makeText(requireContext(), R.string.weekly_menu_export_error, Toast.LENGTH_SHORT).show()
         }
-
-        // Initialiser avec le premier plat
-        updateDialogContent(currentIndex)
-
-        dialog.show()
     }
 
     private fun initStartDate() {

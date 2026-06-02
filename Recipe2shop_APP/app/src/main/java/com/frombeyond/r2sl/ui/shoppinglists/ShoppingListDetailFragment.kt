@@ -14,9 +14,11 @@ import com.frombeyond.r2sl.ui.BaseFragment
 import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.data.export.ShoppingListPdfGenerator
 import com.frombeyond.r2sl.data.local.IngredientEmojiManager
+import com.frombeyond.r2sl.data.local.RayonsManager
 import com.frombeyond.r2sl.data.local.ShoppingListStorageManager
 import com.frombeyond.r2sl.utils.CategoryEmojiHelper
 import com.frombeyond.r2sl.utils.IngredientNormalizer
+import com.frombeyond.r2sl.utils.RayonPickerHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import java.io.IOException
@@ -28,6 +30,7 @@ import java.util.Locale
 class ShoppingListDetailFragment : BaseFragment() {
 
     private lateinit var storageManager: ShoppingListStorageManager
+    private lateinit var rayonsManager: RayonsManager
     private lateinit var itemsContainer: LinearLayout
     private lateinit var titleText: TextView
     private lateinit var datesText: TextView
@@ -55,6 +58,13 @@ class ShoppingListDetailFragment : BaseFragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_shopping_list_detail, container, false)
         storageManager = ShoppingListStorageManager(requireContext())
+        rayonsManager = RayonsManager(requireContext())
+        inputCategory.setText(RayonsManager.DEFAULT_CATEGORY)
+        inputCategory.setOnClickListener {
+            RayonPickerHelper.show(requireContext(), rayonsManager, inputCategory.text?.toString()) { selected ->
+                inputCategory.setText(selected)
+            }
+        }
         itemsContainer = root.findViewById(R.id.shopping_list_items_container)
         titleText = root.findViewById(R.id.shopping_list_detail_title)
         datesText = root.findViewById(R.id.shopping_list_detail_dates)

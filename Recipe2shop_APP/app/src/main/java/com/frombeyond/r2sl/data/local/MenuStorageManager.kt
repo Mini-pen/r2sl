@@ -23,16 +23,19 @@ class MenuStorageManager(private val context: Context) {
             val assignments = (0 until assignmentsArray.length()).mapNotNull { index ->
                 MenuAssignment.fromJson(assignmentsArray.optJSONObject(index))
             }
-            MenuData(startDate, assignments)
+            val updatedAt = json.optLong(KEY_UPDATED_AT, 0L)
+            MenuData(startDate, assignments, updatedAt)
         } catch (_: Exception) {
-            MenuData(null, emptyList())
+            MenuData(null, emptyList(), 0L)
         }
     }
 
     fun saveMenu(menuData: MenuData) {
         val file = getFile()
+        val updatedAt = System.currentTimeMillis()
         val json = JSONObject().apply {
             menuData.startDate?.let { put(KEY_START_DATE, it) }
+            put(KEY_UPDATED_AT, updatedAt)
             put(KEY_ASSIGNMENTS, JSONArray().apply {
                 menuData.assignments.forEach { put(it.toJson()) }
             })
@@ -99,13 +102,56 @@ class MenuStorageManager(private val context: Context) {
         }
     }
 
+    /**
+     * * Copies all meal assignments from [sourceDate] to the next [dayCount] days.
+     * Fails if any target day already has at least one assignment.
+     */
+    fun copyDayToFollowingDays(sourceDate: LocalDate, dayCount: Int = 7): MenuCopyResult {
+        if (dayCount < 1) {
+            return MenuCopyResult.InvalidDayCount
+        }
+        val sourceDateStr = sourceDate.toString()
+        val sourceAssignments = loadMenu().assignments.filter { it.date == sourceDateStr }
+        if (sourceAssignments.isEmpty()) {
+            return MenuCopyResult.SourceDayEmpty
+        }
+        val allAssignments = loadMenu().assignments
+        for (offset in 1..dayCount) {
+            val targetDate = sourceDate.plusDays(offset.toLong()).toString()
+            if (allAssignments.any { it.date == targetDate }) {
+                return MenuCopyResult.Overlap(LocalDate.parse(targetDate))
+            }
+        }
+        val updated = allAssignments.toMutableList()
+        for (offset in 1..dayCount) {
+            val targetDate = sourceDate.plusDays(offset.toLong()).toString()
+            sourceAssignments.forEach { assignment ->
+                updated.add(
+                    assignment.copy(
+                        date = targetDate
+                    )
+                )
+            }
+        }
+        saveMenu(loadMenu().copy(assignments = updated))
+        return MenuCopyResult.Success(dayCount)
+    }
+
+    sealed class MenuCopyResult {
+        data object SourceDayEmpty : MenuCopyResult()
+        data object InvalidDayCount : MenuCopyResult()
+        data class Overlap(val date: LocalDate) : MenuCopyResult()
+        data class Success(val daysCopied: Int) : MenuCopyResult()
+    }
+
     private fun getFile(): File {
         return File(context.filesDir, FILE_NAME)
     }
 
     data class MenuData(
         val startDate: String?,
-        val assignments: List<MenuAssignment>
+        val assignments: List<MenuAssignment>,
+        val updatedAt: Long = 0L
     )
 
     data class MenuAssignment(
@@ -142,6 +188,7 @@ class MenuStorageManager(private val context: Context) {
         private const val FILE_NAME = "menu_assignments.json"
         private const val KEY_START_DATE = "startDate"
         private const val KEY_ASSIGNMENTS = "assignments"
+        private const val KEY_UPDATED_AT = "updatedAt"
         const val MEAL_LUNCH = "lunch"
         const val MEAL_DINNER = "dinner"
     }

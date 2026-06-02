@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.Fragment
 import com.frombeyond.r2sl.ui.BaseFragment
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,8 +32,11 @@ import com.frombeyond.r2sl.R
 import com.frombeyond.r2sl.auth.GoogleAuthManager
 import com.frombeyond.r2sl.data.AppSettingsManager
 import com.frombeyond.r2sl.data.local.AppDataBackupManager
+import com.frombeyond.r2sl.data.local.AppDataBackupManager.ImportStrategy
+import com.frombeyond.r2sl.data.local.AppDataBackupManager.RecipeConflict
 import com.frombeyond.r2sl.data.local.IngredientEmojiManager
 import com.frombeyond.r2sl.data.local.RayonsManager
+import com.frombeyond.r2sl.utils.RayonPickerHelper
 import com.frombeyond.r2sl.ui.recipes.RecipesLocalFileManager
 import com.frombeyond.r2sl.utils.AuthLogger
 import com.frombeyond.r2sl.utils.ErrorLogger
@@ -41,6 +45,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -124,6 +130,7 @@ class SettingsFragment : BaseFragment() {
     private var pendingDriveAction: String? = null
 
     private lateinit var rootView: View
+    private val pendingRecipeConflictChoices = mutableMapOf<String, Boolean>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -154,6 +161,9 @@ class SettingsFragment : BaseFragment() {
     
     override fun onResume() {
         super.onResume()
+        if (::rayonsManager.isInitialized) {
+            refreshRayonsList()
+        }
         // Rafraîchir les logs si le mode développeur est activé
         if (appSettingsManager.isDevFeaturesEnabled()) {
             refreshErrorLogs()
@@ -280,6 +290,24 @@ class SettingsFragment : BaseFragment() {
             val count = emojiManager.loadDefaultFromAssets()
             Toast.makeText(requireContext(), getString(R.string.settings_emoji_dict_loaded, count), Toast.LENGTH_SHORT).show()
         }
+
+        btnRayonsAdd.setOnClickListener {
+            RayonPickerHelper.promptCustomRayon(requireContext(), rayonsManager) {
+                refreshRayonsList()
+            }
+        }
+
+        btnRayonsPrefill.setOnClickListener {
+            val added = rayonsManager.loadFromRecipes(recipesFileManager)
+            refreshRayonsList()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.rayon_prefill_done, added),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        refreshRayonsList()
 
         btnRefreshRecipesIndex.setOnClickListener {
             recipesFileManager.refreshIndex()
@@ -460,12 +488,176 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun importBackupFromUri(uri: Uri) {
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             val resolver = requireContext().contentResolver
+            val zipBytes = withContext(Dispatchers.IO) {
+                try {
+                    resolver.openInputStream(uri)?.use { input ->
+                        val buffer = ByteArrayOutputStream()
+                        input.copyTo(buffer)
+                        buffer.toByteArray()
+                    }
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            if (zipBytes == null) {
+                Toast.makeText(requireContext(), R.string.settings_local_restore_error, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            val preview = withContext(Dispatchers.IO) {
+                backupManager.previewBackup(ByteArrayInputStream(zipBytes))
+            }
+            if (preview == null) {
+                Toast.makeText(requireContext(), R.string.settings_local_restore_error, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            if (!backupManager.hasExistingData()) {
+                executeBackupImport(zipBytes, ImportStrategy.overwriteAll())
+                return@launch
+            }
+
+            showImportModeDialog(zipBytes, preview)
+        }
+    }
+
+    private fun showImportModeDialog(zipBytes: ByteArray, preview: com.frombeyond.r2sl.data.local.AppDataBackupManager.BackupPreview) {
+        val modeChoices = arrayOf(
+            getString(R.string.settings_import_mode_overwrite),
+            getString(R.string.settings_import_mode_ask)
+        )
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_import_warning_title)
+            .setMessage(R.string.settings_import_warning_message)
+            .setSingleChoiceItems(modeChoices, 1, null)
+            .setNegativeButton(R.string.recipes_edit_duplicate_cancel, null)
+            .setPositiveButton(R.string.shopping_lists_confirm_create) { dialog, _ ->
+                val selected = (dialog as androidx.appcompat.app.AlertDialog).listView.checkedItemPosition
+                if (selected == 0) {
+                    executeBackupImport(zipBytes, ImportStrategy.overwriteAll())
+                } else {
+                    showCategoryChoicesDialog(zipBytes, preview)
+                }
+            }
+            .show()
+    }
+
+    private fun showCategoryChoicesDialog(zipBytes: ByteArray, preview: com.frombeyond.r2sl.data.local.AppDataBackupManager.BackupPreview) {
+        val categories = listOf(
+            AppDataBackupManager.CATEGORY_USER to getString(R.string.settings_import_category_user),
+            AppDataBackupManager.CATEGORY_CONFIG to getString(R.string.settings_import_category_config),
+            AppDataBackupManager.CATEGORY_RECIPES to getString(R.string.settings_import_category_recipes),
+            AppDataBackupManager.CATEGORY_MENUS to getString(R.string.settings_import_category_menus),
+            AppDataBackupManager.CATEGORY_SHOPPING_LISTS to getString(R.string.settings_import_category_lists),
+            AppDataBackupManager.CATEGORY_DISHES to getString(R.string.settings_import_category_dishes)
+        )
+        val categorySelections = mutableMapOf<String, Boolean>()
+        categories.forEach { (key, _) -> categorySelections[key] = false }
+        val labels = categories.map { (_, label) -> label }.toTypedArray()
+        val checked = BooleanArray(labels.size) { false }
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_import_choose_categories)
+            .setMultiChoiceItems(labels, checked) { _, which, isChecked ->
+                categorySelections[categories[which].first] = isChecked
+            }
+            .setNegativeButton(R.string.recipes_edit_duplicate_cancel, null)
+            .setPositiveButton(R.string.shopping_lists_confirm_create) { _, _ ->
+                pendingRecipeConflictChoices.clear()
+                val strategy = ImportStrategy(
+                    overwriteAll = false,
+                    categoryResolver = { category, incomingUpdatedAt, localUpdatedAt ->
+                        val keepIncoming = categorySelections[category] ?: false
+                        if (!keepIncoming) {
+                            return@ImportStrategy false
+                        }
+                        incomingUpdatedAt >= localUpdatedAt
+                    },
+                    recipeResolver = { conflict ->
+                        pendingRecipeConflictChoices[conflictKey(conflict)] ?: false
+                    }
+                )
+                collectRecipeConflictsAndResolve(zipBytes, strategy)
+            }
+            .show()
+    }
+
+    private fun collectRecipeConflictsAndResolve(zipBytes: ByteArray, strategy: ImportStrategy) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val conflicts = mutableListOf<RecipeConflict>()
+            try {
+                val previewManager = AppDataBackupManager(requireContext())
+                val localRecipes = recipesFileManager.listRecipeEntries().associateBy { it.fileName.lowercase() }
+                java.util.zip.ZipInputStream(ByteArrayInputStream(zipBytes)).use { zip ->
+                    var entry = zip.nextEntry
+                    while (entry != null) {
+                        if (!entry.isDirectory && entry.name.startsWith("recipes/") && entry.name.endsWith(".json")) {
+                            val fileName = entry.name.removePrefix("recipes/").lowercase()
+                            if (localRecipes.containsKey(fileName)) {
+                                val content = zip.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                                val obj = org.json.JSONObject(content)
+                                val recipeObj = obj.getJSONArray("recipes").optJSONObject(0)
+                                if (recipeObj != null) {
+                                    conflicts.add(
+                                        RecipeConflict(
+                                            incomingRecipeId = recipeObj.optString("id"),
+                                            localRecipeId = fileName,
+                                            recipeName = recipeObj.optString("name", fileName)
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        zip.closeEntry()
+                        entry = zip.nextEntry
+                    }
+                }
+            } catch (_: Exception) {
+                // no-op
+            }
+            withContext(Dispatchers.Main) {
+                if (conflicts.isEmpty()) {
+                    executeBackupImport(zipBytes, strategy)
+                } else {
+                    askRecipeConflict(conflicts, 0, zipBytes, strategy)
+                }
+            }
+        }
+    }
+
+    private fun askRecipeConflict(
+        conflicts: List<RecipeConflict>,
+        index: Int,
+        zipBytes: ByteArray,
+        strategy: ImportStrategy
+    ) {
+        if (index >= conflicts.size) {
+            executeBackupImport(zipBytes, strategy)
+            return
+        }
+        val conflict = conflicts[index]
+        val title = getString(R.string.settings_import_recipe_conflict_title, conflict.recipeName)
+        val message = getString(R.string.settings_import_recipe_conflict_message)
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setNegativeButton(R.string.settings_import_recipe_keep_phone) { _, _ ->
+                pendingRecipeConflictChoices[conflictKey(conflict)] = false
+                askRecipeConflict(conflicts, index + 1, zipBytes, strategy)
+            }
+            .setPositiveButton(R.string.settings_import_recipe_keep_file) { _, _ ->
+                pendingRecipeConflictChoices[conflictKey(conflict)] = true
+                askRecipeConflict(conflicts, index + 1, zipBytes, strategy)
+            }
+            .show()
+    }
+
+    private fun executeBackupImport(zipBytes: ByteArray, strategy: ImportStrategy) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val result = try {
-                resolver.openInputStream(uri)?.use { input ->
-                    backupManager.restoreBackupZip(input)
-                } ?: -1
+                backupManager.restoreBackupZip(ByteArrayInputStream(zipBytes), strategy)
             } catch (_: Exception) {
                 -1
             }
@@ -481,6 +673,10 @@ class SettingsFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun conflictKey(conflict: RecipeConflict): String {
+        return "${conflict.incomingRecipeId}:${conflict.localRecipeId}:${conflict.recipeName}"
     }
 
     private fun showClearDataDialog() {
@@ -1191,6 +1387,46 @@ class SettingsFragment : BaseFragment() {
     }
     
     
+    private fun refreshRayonsList() {
+        rayonsListContainer.removeAllViews()
+        rayonsManager.getRayons().forEach { rayon ->
+            val row = layoutInflater.inflate(R.layout.item_rayon_row, rayonsListContainer, false)
+            row.findViewById<TextView>(R.id.item_rayon_name).text = rayon
+            row.findViewById<MaterialButton>(R.id.item_rayon_remove).setOnClickListener {
+                confirmRemoveRayon(rayon)
+            }
+            rayonsListContainer.addView(row)
+        }
+    }
+
+    private fun confirmRemoveRayon(rayon: String) {
+        val others = rayonsManager.getRayons().filter { !it.equals(rayon, ignoreCase = true) }
+        if (others.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.rayon_remove_last, Toast.LENGTH_SHORT).show()
+            return
+        }
+        var selectedIndex = 0
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.rayon_remove_title)
+            .setMessage(getString(R.string.rayon_remove_message, rayon))
+            .setSingleChoiceItems(others.toTypedArray(), 0) { _, which ->
+                selectedIndex = which
+            }
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val target = others[selectedIndex]
+                val count = rayonsManager.reassignInAllRecipes(rayon, target)
+                rayonsManager.removeRayon(rayon)
+                refreshRayonsList()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.rayon_reassigned, count),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     companion object {
         private const val RC_SIGN_IN = 9001
         const val RC_DRIVE_PERMISSIONS = 9002

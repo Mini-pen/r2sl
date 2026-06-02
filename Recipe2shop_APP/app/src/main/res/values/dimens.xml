@@ -28,4 +28,8 @@
     <!-- Marges des fragments -->
     <dimen name="fragment_margin">16dp</dimen>
     <dimen name="fragment_padding">16dp</dimen>
+
+    <dimen name="recipe_photo_viewer_height">200dp</dimen>
+    <dimen name="recipe_photo_step_thumb_height">96dp</dimen>
+    <dimen name="recipe_photo_step_thumb_width">128dp</dimen>
 </resources>
